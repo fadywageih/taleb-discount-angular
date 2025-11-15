@@ -1,0 +1,43 @@
+<app-header></app-header>
+<section class="min-h-screen relative overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100">
+  <!-- Background Image -->
+  <div class="absolute inset-0">
+    <img class="w-full h-full object-cover opacity-30" [src]="'assets/Images/photo2.png'" alt="Background">
+  </div>
+  
+  <!-- Content Overlay -->
+  <div class="relative z-10">
+    <!-- Cover Section -->  
+    <div class="py-10">
+      <div class="container mx-auto px-4 grid md:grid-cols-2 gap-30 items-center">
+        <div class="bg-white/80 backdrop-blur-sm rounded-3xl p-10 transform hover:scale-105 transition-all duration-500 hover:shadow-3xl group">
+          <img [src]="'assets/Images/PhotoForCover1.jpeg'" alt="For Students" 
+               class="w-64 h-64 object-cover rounded-2xl mb-8 mx-auto group-hover:scale-105 transition-transform duration-500">
+          <a class="block text-center" routerLink="/student">
+            <h2 class="text-2xl font-bold text-gray-800 hover:text-blue-600 transition duration-300 transform group-hover:scale-105">
+              "One Click, For Student!"
+            </h2>
+          </a>
+        </div>
+        <div class="bg-white/80 backdrop-blur-sm rounded-3xl p-10 transform hover:scale-105 transition-all duration-500 hover:shadow-3xl group">
+          <img [src]="'assets/Images/PhotoForCover2.jpg'" alt="For Vendors" 
+               class="w-64 h-64 object-cover rounded-2xl mb-8 mx-auto group-hover:scale-105 transition-transform duration-500">
+          <a class="block text-center" routerLink="/vendor/signup">
+            <h2 class="text-2xl font-bold text-gray-800 hover:text-blue-600 transition duration-300 transform group-hover:scale-105">
+              "One Click, For Vendors!"
+            </h2>
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <section class="products container mx-auto px-4 py-11 text-center">
+      <p class="text-3xl md:text-4xl font-bold text-gray-800 italic bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent animate-pulse">
+        "One Click, Countless Student Savings!"
+      </p>
+    </section>
+  </div>
+  
+  <!-- Brands Section -->
+  <app-brands></app-brands>
+</section>

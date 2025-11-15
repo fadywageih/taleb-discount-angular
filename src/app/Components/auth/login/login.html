@@ -1,0 +1,164 @@
+<!-- src/app/login/login.component.html -->
+<div
+  class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
+  <div class="w-full max-w-md animate-fadeIn">
+    <div
+      class="w-full bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 transition-all duration-500 hover:shadow-3xl hover:scale-[1.02] border border-white/20">
+      <form (ngSubmit)="onSubmit()" #loginForm="ngForm" class="space-y-6">
+
+        <!-- Header -->
+        <div class="text-center">
+          <div
+            class="w-16 h-16 bg-gradient-to-r from-slate-700 to-purple-800 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="text-2xl text-white">🎓</span>
+          </div>
+          <h2
+            class="text-3xl font-bold bg-gradient-to-r from-slate-700 to-purple-800 bg-clip-text text-transparent mb-2">
+            Welcome Back
+          </h2>
+          <p class="text-gray-600 text-sm">Sign in to your account</p>
+        </div>
+
+        <!-- Error Message -->
+        <div *ngIf="errorMessage" class="p-4 bg-red-50 border border-red-200 rounded-xl animate-shake">
+          <div class="flex items-center">
+            <i class="text-red-500 text-lg mr-3">⚠️</i>
+            <span class="text-red-700 font-medium">{{ errorMessage }}</span>
+          </div>
+        </div>
+
+        <!-- Email Field -->
+        <div class="space-y-2">
+          <label class="text-sm font-semibold text-gray-700 block">Email Address</label>
+          <div class="relative">
+            <i class="absolute top-1/2 left-4 transform -translate-y-1/2 text-purple-600 text-lg">📧</i>
+            <input type="email" name="email" [(ngModel)]="loginDto.email" #email="ngModel"
+              (input)="onFieldChange('email', loginDto.email)" required email [class]="getInputClass(email, 'email')"
+              placeholder="Enter your email"
+              class="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-purple-200 focus:border-purple-500 bg-white/80 transition-all duration-300" />
+          </div>
+          <div *ngIf="(email.touched || loginDto.email) && fieldErrors['email']"
+            class="text-red-600 text-sm mt-1 font-medium animate-pulse">
+            {{ fieldErrors['email'] }}
+          </div>
+        </div>
+
+        <!-- Password Field -->
+        <div class="space-y-2">
+          <label class="text-sm font-semibold text-gray-700 block">Password</label>
+          <div class="relative">
+            <i class="absolute top-1/2 left-4 transform -translate-y-1/2 text-purple-600 text-lg">🔒</i>
+            <input type="password" name="password" [(ngModel)]="loginDto.password" #password="ngModel"
+              (input)="onFieldChange('password', loginDto.password)" required minlength="6"
+              [class]="getInputClass(password, 'password')" placeholder="Enter your password"
+              class="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-purple-200 focus:border-purple-500 bg-white/80 transition-all duration-300" />
+          </div>
+          <div *ngIf="(password.touched || loginDto.password) && fieldErrors['password']"
+            class="text-red-600 text-sm mt-1 font-medium animate-pulse">
+            {{ fieldErrors['password'] }}
+          </div>
+        </div>
+
+        <!-- Forgot Password -->
+        <div class="text-right">
+          <a [routerLink]="['/forgot-password']"
+            class="text-purple-700 hover:text-purple-900 text-sm font-medium transition-colors hover:underline">
+            Forgot Password?
+          </a>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" [disabled]="!loginForm.form.valid || isLoading || !isFormValid()"
+          class="w-full py-4 bg-gradient-to-r from-slate-700 to-purple-800 text-white font-bold rounded-xl cursor-pointer transition-all duration-300 hover:from-slate-800 hover:to-purple-900 hover:scale-[1.02] shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+          <span *ngIf="!isLoading" class="flex items-center justify-center">
+            <i class="mr-2">🚀</i> Sign In
+          </span>
+          <span *ngIf="isLoading" class="flex items-center justify-center">
+            <i class="animate-spin mr-2">⏳</i> Signing In...
+          </span>
+        </button>
+
+        <!-- Divider -->
+        <div class="relative my-8">
+          <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-gray-300"></div>
+          </div>
+          <div class="relative flex justify-center text-sm">
+            <span class="px-2 bg-white text-gray-500">Or continue with</span>
+          </div>
+        </div>
+
+        <!-- Registration Links -->
+        <div class="space-y-3 text-center">
+          <p class="text-gray-600 text-sm">
+            Student?
+            <a [routerLink]="['/register', 'school']"
+              class="text-purple-700 hover:text-purple-900 font-semibold transition-colors hover:underline ml-1">
+              Join School
+            </a>
+            or
+            <a [routerLink]="['/register', 'university']"
+              class="text-purple-700 hover:text-purple-900 font-semibold transition-colors hover:underline ml-1">
+              Join University
+            </a>
+          </p>
+          <p class="text-gray-600 text-sm">
+            Business Owner?
+            <a [routerLink]="['/register', 'vendor']"
+              class="text-purple-700 hover:text-purple-900 font-semibold transition-colors hover:underline ml-1">
+              Register as Vendor
+            </a>
+          </p>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+  .animate-fadeIn {
+    animation: fadeIn 0.6s ease-out;
+  }
+
+  .animate-shake {
+    animation: shake 0.5s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes shake {
+
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+
+    25% {
+      transform: translateX(-5px);
+    }
+
+    75% {
+      transform: translateX(5px);
+    }
+  }
+
+  .input-success {
+    border-color: #10b981 !important;
+    background-color: #f0fdf4 !important;
+  }
+
+  .input-error {
+    border-color: #ef4444 !important;
+    background-color: #fef2f2 !important;
+  }
+</style>

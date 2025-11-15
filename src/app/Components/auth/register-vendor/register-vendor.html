@@ -1,0 +1,311 @@
+<!-- src/app/Components/auth/register-vendor/register-vendor.component.html -->
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-900 via-pink-900 to-rose-900 p-4">
+  <div class="w-full max-w-4xl animate-fadeIn">
+    <div
+      class="w-full bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-8 transition-all duration-500 hover:shadow-3xl hover:scale-[1.01] border border-white/20">
+      <form (ngSubmit)="onSubmit()" #registerForm="ngForm" class="space-y-6">
+
+        <!-- Header -->
+        <div class="text-center">
+          <div
+            class="w-20 h-20 bg-gradient-to-r from-rose-600 to-pink-700 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="text-3xl text-white">🏢</span>
+          </div>
+          <h2 class="text-4xl font-bold bg-gradient-to-r from-rose-700 to-pink-800 bg-clip-text text-transparent mb-2">
+            Vendor Registration
+          </h2>
+          <p class="text-gray-600">Join as a business vendor</p>
+        </div>
+
+        <!-- Error Message -->
+        <div *ngIf="errorMessage" class="p-4 bg-red-50 border border-red-200 rounded-xl animate-shake">
+          <div class="flex items-center">
+            <i class="text-red-500 text-lg mr-3">⚠️</i>
+            <span class="text-red-700 font-medium">{{ errorMessage }}</span>
+          </div>
+        </div>
+
+        <!-- Business Information Section -->
+        <div class="bg-rose-50/50 rounded-2xl p-6 border border-rose-200">
+          <h3 class="text-lg font-semibold text-rose-900 mb-4 flex items-center">
+            <i class="mr-2">🏢</i> Business Information
+          </h3>
+
+          <!-- Business Name -->
+          <div class="space-y-2">
+            <label class="text-sm font-semibold text-gray-700 block">Business Name</label>
+            <div class="relative">
+              <i class="absolute top-1/2 left-4 transform -translate-y-1/2 text-rose-600 text-lg">🏢</i>
+              <input type="text" name="businessName" [(ngModel)]="registerData.businessName" #businessName="ngModel"
+                (input)="onFieldChange('businessName', registerData.businessName)" required
+                [class]="getInputClass(businessName, 'businessName')" placeholder="Enter your business name"
+                class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-200 focus:border-rose-500 bg-white transition-all duration-300" />
+            </div>
+            <div *ngIf="(businessName.touched || registerData.businessName) && fieldErrors['businessName']"
+              class="text-red-600 text-sm mt-1 font-medium">
+              {{ fieldErrors['businessName'] }}
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <!-- Email -->
+            <div class="space-y-2">
+              <label class="text-sm font-semibold text-gray-700 block">Email Address</label>
+              <div class="relative">
+                <i class="absolute top-1/2 left-4 transform -translate-y-1/2 text-rose-600 text-lg">📧</i>
+                <input type="email" name="email" [(ngModel)]="registerData.email" #email="ngModel"
+                  (input)="onFieldChange('email', registerData.email)" required email
+                  [class]="getInputClass(email, 'email')" placeholder="Business email"
+                  class="w-full pl-12 pr-12 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-200 focus:border-rose-500 bg-white transition-all duration-300" />
+
+                <!-- مؤشر التحميل -->
+                <div *ngIf="checkingEmail" class="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-rose-600"></div>
+                </div>
+
+                <!-- علامة الصح عندما الإيميل متاح -->
+                <div *ngIf="!checkingEmail && !fieldErrors['email'] && registerData.email && email.valid"
+                  class="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  <i class="text-green-500 text-lg">✅</i>
+                </div>
+
+                <!-- علامة الخطأ عندما الإيميل مستخدم -->
+                <div *ngIf="!checkingEmail && fieldErrors['email'] && registerData.email"
+                  class="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  <i class="text-red-500 text-lg">❌</i>
+                </div>
+              </div>
+
+              <!-- رسائل الخطأ -->
+              <div *ngIf="(email.touched || registerData.email) && fieldErrors['email']"
+                class="text-red-600 text-sm mt-1 font-medium">
+                {{ fieldErrors['email'] }}
+              </div>
+
+              <!-- رسالة التحقق -->
+              <div *ngIf="checkingEmail" class="text-rose-600 text-sm mt-1 font-medium flex items-center">
+                <div class="animate-spin rounded-full h-3 w-3 border-b-2 border-rose-600 mr-2"></div>
+                Checking email availability...
+              </div>
+
+              <!-- رسالة النجاح -->
+              <div *ngIf="!checkingEmail && !fieldErrors['email'] && registerData.email && email.valid"
+                class="text-green-600 text-sm mt-1 font-medium flex items-center">
+                <i class="mr-1">✅</i> Email is available
+              </div>
+            </div>
+
+            <!-- Phone -->
+            <div class="space-y-2">
+              <label class="text-sm font-semibold text-gray-700 block">Phone Number</label>
+              <div class="relative">
+                <i class="absolute top-1/2 left-4 transform -translate-y-1/2 text-rose-600 text-lg">📞</i>
+                <input type="tel" name="phone" [(ngModel)]="registerData.phone" #phone="ngModel"
+                  (input)="onFieldChange('phone', registerData.phone)" required [class]="getInputClass(phone, 'phone')"
+                  placeholder="Business phone"
+                  class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-200 focus:border-rose-500 bg-white transition-all duration-300" />
+              </div>
+              <div *ngIf="(phone.touched || registerData.phone) && fieldErrors['phone']"
+                class="text-red-600 text-sm mt-1 font-medium">
+                {{ fieldErrors['phone'] }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="space-y-2 mt-4">
+            <label class="text-sm font-semibold text-gray-700 block flex items-center">
+              <i class="mr-2">📝</i> Business Description
+            </label>
+            <textarea name="description" [(ngModel)]="registerData.description" #description="ngModel"
+              (input)="onFieldChange('description', registerData.description)" rows="3" required
+              [class]="getInputClass(description, 'description')" placeholder="Describe your business and services..."
+              class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-200 focus:border-rose-500 bg-white transition-all duration-300"></textarea>
+            <div *ngIf="(description.touched || registerData.description) && fieldErrors['description']"
+              class="text-red-600 text-sm mt-1 font-medium">
+              {{ fieldErrors['description'] }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Address Section -->
+        <div class="bg-pink-50/50 rounded-2xl p-6 border border-pink-200">
+          <h3 class="text-lg font-semibold text-pink-900 mb-4 flex items-center">
+            <i class="mr-2">📍</i> Address Information
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Primary Address -->
+            <div class="space-y-2">
+              <label class="text-sm font-semibold text-gray-700 block">Primary Address</label>
+              <div class="relative">
+                <i class="absolute top-1/2 left-4 transform -translate-y-1/2 text-pink-600 text-lg">📍</i>
+                <input type="text" name="address" [(ngModel)]="registerData.address" #address="ngModel"
+                  (input)="onFieldChange('address', registerData.address)" required
+                  [class]="getInputClass(address, 'address')" placeholder="Business address"
+                  class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-200 focus:border-pink-500 bg-white transition-all duration-300" />
+              </div>
+              <div *ngIf="(address.touched || registerData.address) && fieldErrors['address']"
+                class="text-red-600 text-sm mt-1 font-medium">
+                {{ fieldErrors['address'] }}
+              </div>
+            </div>
+
+            <!-- Secondary Address -->
+            <div class="space-y-2">
+              <label class="text-sm font-semibold text-gray-700 block">Secondary Address (Optional)</label>
+              <div class="relative">
+                <i class="absolute top-1/2 left-4 transform -translate-y-1/2 text-pink-600 text-lg">📍</i>
+                <input type="text" name="address2" [(ngModel)]="registerData.address2" #address2="ngModel"
+                  [class]="getInputClass(address2, 'address2')" placeholder="Additional address info"
+                  class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-200 focus:border-pink-500 bg-white transition-all duration-300" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Social Media Section -->
+        <div class="bg-fuchsia-50/50 rounded-2xl p-6 border border-fuchsia-200">
+          <h3 class="text-lg font-semibold text-fuchsia-900 mb-4 flex items-center">
+            <i class="mr-2">🌐</i> Social Media & Links
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Website -->
+            <div class="space-y-2">
+              <label class="text-sm font-semibold text-gray-700 block">Website (Optional)</label>
+              <div class="relative">
+                <i class="absolute top-1/2 left-4 transform -translate-y-1/2 text-fuchsia-600 text-lg">🌐</i>
+                <input type="url" name="website" [(ngModel)]="registerData.website" #website="ngModel"
+                  [class]="getInputClass(website, 'website')" placeholder="https://yourwebsite.com"
+                  class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-fuchsia-200 focus:border-fuchsia-500 bg-white transition-all duration-300" />
+              </div>
+            </div>
+
+            <!-- Facebook -->
+            <div class="space-y-2">
+              <label class="text-sm font-semibold text-gray-700 block">Facebook URL (Optional)</label>
+              <div class="relative">
+                <i class="absolute top-1/2 left-4 transform -translate-y-1/2 text-fuchsia-600 text-lg">📘</i>
+                <input type="url" name="facebookUrl" [(ngModel)]="registerData.facebookUrl" #facebookUrl="ngModel"
+                  [class]="getInputClass(facebookUrl, 'facebookUrl')" placeholder="https://facebook.com/yourpage"
+                  class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-fuchsia-200 focus:border-fuchsia-500 bg-white transition-all duration-300" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Security Section -->
+        <div class="bg-purple-50/50 rounded-2xl p-6 border border-purple-200">
+          <h3 class="text-lg font-semibold text-purple-900 mb-4 flex items-center">
+            <i class="mr-2">🔒</i> Security Information
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Password -->
+            <div class="space-y-2">
+              <label class="text-sm font-semibold text-gray-700 block">Password</label>
+              <div class="relative">
+                <i class="absolute top-1/2 left-4 transform -translate-y-1/2 text-purple-600 text-lg">🔒</i>
+                <input type="password" name="password" [(ngModel)]="registerData.password" #password="ngModel"
+                  (input)="onFieldChange('password', registerData.password)" required minlength="6"
+                  [class]="getInputClass(password, 'password')" placeholder="Create password"
+                  class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-500 bg-white transition-all duration-300" />
+              </div>
+              <div *ngIf="(password.touched || registerData.password) && fieldErrors['password']"
+                class="text-red-600 text-sm mt-1 font-medium">
+                {{ fieldErrors['password'] }}
+              </div>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="space-y-2">
+              <label class="text-sm font-semibold text-gray-700 block">Confirm Password</label>
+              <div class="relative">
+                <i class="absolute top-1/2 left-4 transform -translate-y-1/2 text-purple-600 text-lg">✅</i>
+                <input type="password" name="confirmPassword" [(ngModel)]="registerData.confirmPassword"
+                  #confirmPassword="ngModel" (input)="onFieldChange('confirmPassword', registerData.confirmPassword)"
+                  required [class]="getInputClass(confirmPassword, 'confirmPassword')"
+                  placeholder="Confirm your password"
+                  class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-500 bg-white transition-all duration-300" />
+              </div>
+              <div *ngIf="(confirmPassword.touched || registerData.confirmPassword) && fieldErrors['confirmPassword']"
+                class="text-red-600 text-sm mt-1 font-medium">
+                {{ fieldErrors['confirmPassword'] }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" [disabled]="!registerForm.form.valid || isLoading || checkingEmail || !emailChecked"
+          class="w-full py-4 bg-gradient-to-r from-rose-600 to-pink-700 text-white font-bold rounded-xl cursor-pointer transition-all duration-300 hover:from-rose-700 hover:to-pink-800 hover:scale-[1.02] shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-lg">
+
+          <span *ngIf="!isLoading && !checkingEmail" class="flex items-center justify-center">
+            <i class="mr-2">🏢</i>
+            <span *ngIf="emailChecked">Register as Vendor</span>
+            <span *ngIf="!emailChecked && registerData.email">Verify Email First</span>
+            <span *ngIf="!emailChecked && !registerData.email">Register as Vendor</span>
+          </span>
+
+          <span *ngIf="checkingEmail" class="flex items-center justify-center">
+            <i class="animate-spin mr-2">⏳</i> Verifying Email...
+          </span>
+
+          <span *ngIf="isLoading" class="flex items-center justify-center">
+            <i class="animate-spin mr-2">⏳</i> Registering...
+          </span>
+        </button>
+
+        <!-- Login Link -->
+        <div class="text-center">
+          <p class="text-gray-600">
+            Already have an account?
+            <a [routerLink]="['/login']"
+              class="text-rose-700 hover:text-rose-900 font-semibold transition-colors hover:underline ml-1">
+              Login here
+            </a>
+          </p>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+  .animate-fadeIn {
+    animation: fadeIn 0.6s ease-out;
+  }
+
+  .animate-shake {
+    animation: shake 0.5s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes shake {
+
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+
+    25% {
+      transform: translateX(-5px);
+    }
+
+    75% {
+      transform: translateX(5px);
+    }
+  }
+</style>
