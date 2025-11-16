@@ -8,6 +8,7 @@ export interface UserResultDto {
   displayName: string;
   email: string;
   token: string;
+  userType: 'Vendor' | 'School' | 'University'| string;
 }
 
 export interface ResetPasswordDto {

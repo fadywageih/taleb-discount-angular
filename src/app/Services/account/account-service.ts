@@ -1,4 +1,3 @@
-// src/app/Services/account/account-service.ts
 import { Injectable, inject, Inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
@@ -10,8 +9,10 @@ import {
   ResetPasswordDto,
   SchoolRegisterDto,
   VendorRegisterDto,
-  UniversityRegisterDto 
-} from '../../core/types'; 
+  UniversityRegisterDto ,
+
+} from '../../core/index'; 
+
 @Injectable({
   providedIn: 'root'
 })
@@ -21,17 +22,20 @@ export class AccountService {
   public currentUser$ = this.currentUserSource.asObservable();
   private http = inject(HttpClient);
   private router = inject(Router);
+
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
     if (isPlatformBrowser(this.platformId)) {
       this.loadCurrentUser();
     }
   }
+
   private loadCurrentUser(): void {
     const user = this.getCurrentUser();
     if (user) {
       this.currentUserSource.next(user);
     }
   }
+
   login(loginDto: LoginDto): Observable<UserResultDto> {
     return this.http.post<UserResultDto>(`${this.baseUrl}/Login`, loginDto).pipe(
       tap(user => {
@@ -43,6 +47,7 @@ export class AccountService {
       })
     );
   }
+
   logout() {
     this.removeLocalStorage('token');
     this.removeLocalStorage('user');
@@ -52,6 +57,7 @@ export class AccountService {
       this.router.navigate(['/login']);
     }
   }
+
   getCurrentUser(): UserResultDto | null {
     try {
       if (!isPlatformBrowser(this.platformId)) {
@@ -75,6 +81,27 @@ export class AccountService {
     return !!this.getToken();
   }
 
+  // إضافة دوال التحقق من نوع المستخدم
+  isVendor(): boolean {
+    const user = this.getCurrentUser();
+    return user?.userType === 'Vendor';
+  }
+
+  isSchool(): boolean {
+    const user = this.getCurrentUser();
+    return user?.userType === 'School';
+  }
+
+  isUniversity(): boolean {
+    const user = this.getCurrentUser();
+    return user?.userType === 'University';
+  }
+
+  getUserType(): string | null {
+    const user = this.getCurrentUser();
+    return user?.userType || null;
+  }
+
   // دوال مساعدة آمنة للـ SSR
   private setLocalStorage(key: string, value: string): void {
     if (isPlatformBrowser(this.platformId)) {
@@ -87,6 +114,7 @@ export class AccountService {
       localStorage.removeItem(key);
     }
   }
+
   registerSchool(registerData: SchoolRegisterDto): Observable<UserResultDto> {
     const formData = new FormData();
     Object.keys(registerData).forEach(key => {
@@ -100,9 +128,11 @@ export class AccountService {
     return this.http.post<UserResultDto>(`${this.baseUrl}/register/school`, formData).pipe(
       tap(user => {
         if (user && user.token) {
-          this.setLocalStorage('token', user.token);
-          this.setLocalStorage('user', JSON.stringify(user));
-          this.currentUserSource.next(user);
+          // تأكد أن الـ userType مضبوط بشكل صحيح
+          const userWithType = { ...user, userType: 'School' };
+          this.setLocalStorage('token', userWithType.token);
+          this.setLocalStorage('user', JSON.stringify(userWithType));
+          this.currentUserSource.next(userWithType);
         }
       })
     );
@@ -112,9 +142,11 @@ export class AccountService {
     return this.http.post<UserResultDto>(`${this.baseUrl}/register/vendor`, registerData).pipe(
       tap(user => {
         if (user && user.token) {
-          this.setLocalStorage('token', user.token);
-          this.setLocalStorage('user', JSON.stringify(user));
-          this.currentUserSource.next(user);
+          // تأكد أن الـ userType مضبوط بشكل صحيح
+          const userWithType = { ...user, userType: 'Vendor' };
+          this.setLocalStorage('token', userWithType.token);
+          this.setLocalStorage('user', JSON.stringify(userWithType));
+          this.currentUserSource.next(userWithType);
         }
       })
     );
@@ -133,14 +165,17 @@ export class AccountService {
     return this.http.post<UserResultDto>(`${this.baseUrl}/register/university`, formData).pipe(
       tap(user => {
         if (user && user.token) {
-          this.setLocalStorage('token', user.token);
-          this.setLocalStorage('user', JSON.stringify(user));
-          this.currentUserSource.next(user);
+          // تأكد أن الـ userType مضبوط بشكل صحيح
+          const userWithType = { ...user, userType: 'University' };
+          this.setLocalStorage('token', userWithType.token);
+          this.setLocalStorage('user', JSON.stringify(userWithType));
+          this.currentUserSource.next(userWithType);
         }
       })
     );
   }
-   forgotPassword(email: string): Observable<any> {
+
+  forgotPassword(email: string): Observable<any> {
     return this.http.post(`${this.baseUrl}/forgot-password`, { email });
   }
 
@@ -148,5 +183,3 @@ export class AccountService {
     return this.http.post(`${this.baseUrl}/reset-password`, resetData);
   }
 }
-
-

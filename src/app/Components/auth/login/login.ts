@@ -1,4 +1,3 @@
-// src/app/login/login.component.ts
 import { Component } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -89,12 +88,29 @@ export class Login {
     this.accountService.login(this.loginDto).subscribe({
       next: (response) => {
         this.isLoading = false;
-        this.router.navigate(['/home']);
+        
+        // تحديد الصفحة المناسبة بناءً على نوع المستخدم
+        this.redirectBasedOnUserType(response);
       },
       error: (error) => {
         this.errorMessage = error.error?.message || 'Login failed. Please check your Email or Password.';
         this.isLoading = false;
       }
     });
+  }
+
+  private redirectBasedOnUserType(user: any): void {
+    const userType = user?.userType || this.accountService.getUserType();
+    
+    switch (userType) {
+      case 'Vendor':
+        this.router.navigate(['/vendor/home']);
+        break;
+      case 'School':
+      case 'University':
+      default:
+        this.router.navigate(['/home']);
+        break;
+    }
   }
 }

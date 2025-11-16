@@ -1,4 +1,3 @@
-
 import { RouterModule, Routes } from '@angular/router';
 import { NgModule } from '@angular/core';
 import { Cover } from './Components/cover/cover';
@@ -10,20 +9,26 @@ import { RegisterVendor } from './Components/auth/register-vendor/register-vendo
 import { RegisterUniversity } from './Components/auth/register-university/register-university';
 import { ForgotPassword } from './Components/auth/forgot-password/forgot-password';
 import { ResetPassword } from './Components/auth/reset-password/reset-password';
+import { VendorHome } from './Components/vendor/vendor-home/vendor-home';
+import { VendorEdit } from './Components/vendor/vendor-edit/vendor-edit';
+import { vendorGuard } from './guards/vendor.guard';
 
 export const routes: Routes = [
   { path: '', component: Cover },
-    { path: 'home', component: Home, canActivate: [authGuard] },
-
-  {path: 'cover', component: Cover},
-  {path:'login',component:Login},
-  // Register Routes
+  { path: 'home', component: Home, canActivate: [authGuard] },
+  { path: 'cover', component: Cover },
+  { path: 'login', component: Login },
   { path: 'register/school', component: RegisterSchool },
   { path: 'register/vendor', component: RegisterVendor },
-  {path: 'register/university', component: RegisterUniversity},
-    { path: 'forgot-password', component: ForgotPassword },
-  { path: 'reset-password', component: ResetPassword},
+  { path: 'register/university', component: RegisterUniversity },
+  { path: 'forgot-password', component: ForgotPassword },
+  { path: 'reset-password', component: ResetPassword },
+  
+  // Vendor Routes مع VendorGuard
+  { path: 'vendor/home', component: VendorHome, canActivate: [vendorGuard] },
+  { path: 'vendor/edit', component: VendorEdit, canActivate: [vendorGuard] },
 ];
+
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]

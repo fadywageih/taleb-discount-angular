@@ -1,4 +1,3 @@
-// src/app/Components/auth/register-vendor/register-vendor.component.ts
 import { Component } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AccountService } from '../../../Services/account/account-service';
@@ -191,7 +190,9 @@ export class RegisterVendor {
       next: (user) => {
         this.isLoading = false;
         console.log('🎉 Registration successful:', user);
-        this.router.navigate(['/home']);
+        
+        // تغيير هذا السطر: توجيه إلى VendorHome بدلاً من Home
+        this.router.navigate(['/vendor/home']);
       },
       error: (error) => {
         this.isLoading = false;

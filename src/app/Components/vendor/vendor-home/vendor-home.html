@@ -1,0 +1,207 @@
+<div class="min-h-screen bg-gradient-to-br from-rose-50 via-white to-pink-100">
+  <app-vendor-header></app-vendor-header>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex justify-center items-center py-32">
+    <div class="text-center">
+      <div class="animate-spin rounded-full h-20 w-20 border-b-2 border-rose-600 mx-auto mb-4"></div>
+      <p class="text-gray-600 text-lg">Loading your store...</p>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!isLoading" class="pb-16">
+    <!-- Slider Section -->
+    <section class="py-8 px-4">
+      <div class="max-w-6xl mx-auto">
+        <div class="relative rounded-3xl overflow-hidden shadow-2xl bg-white border-2 border-white/20">
+
+          <!-- Slides Container -->
+          <div class="relative h-80 md:h-96 lg:h-[500px] overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
+
+            <!-- Slides -->
+            <div *ngFor="let image of sliderImages; let i = index" [class]="getSlideClasses(i)" class="cursor-pointer">
+              <img [src]="getImageUrl(image)"
+                [alt]="hasVendorImages ? vendorData.businessName + ' Image ' + (i + 1) : 'Default Slider Image'"
+                (error)="handleImageError($event, i)"
+                class="w-full h-full object-cover transition-transform duration-700">
+
+              <!-- Slide Overlay -->
+              <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent flex items-end">
+                <div class="p-6 md:p-8 text-white">
+                  <h3 class="text-2xl font-bold">
+                    {{ vendorData.businessName || 'Your Business Name' }}
+                  </h3>
+                  <p class="text-lg opacity-90">
+                    {{ hasVendorImages ? 'Explore our products and services' : 'Customize your store with your own images' }}
+                  </p>
+
+                  <button *ngIf="!hasVendorImages" (click)="goToEdit()"
+                    class="mt-4 px-6 py-2 bg-rose-600 hover:bg-rose-700 rounded-lg transition-colors flex items-center gap-2">
+                    <i class="fas fa-camera"></i>
+                    Add Your Business Images
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Navigation -->
+          <button *ngIf="sliderImages.length > 1" (click)="previousSlide()"
+            class="absolute left-4 top-1/2 transform -translate-y-1/2 z-30 bg-white/20 hover:bg-white/30 text-white p-3 md:p-4 rounded-full transition-all duration-300">
+            <i class="fas fa-chevron-left text-lg md:text-xl"></i>
+          </button>
+
+          <button *ngIf="sliderImages.length > 1" (click)="nextSlide()"
+            class="absolute right-4 top-1/2 transform -translate-y-1/2 z-30 bg-white/20 hover:bg-white/30 text-white p-3 md:p-4 rounded-full transition-all duration-300">
+            <i class="fas fa-chevron-right text-lg md:text-xl"></i>
+          </button>
+
+          <!-- Indicators -->
+          <div *ngIf="sliderImages.length > 1"
+            class="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-30 flex space-x-3">
+            <button *ngFor="let image of sliderImages; let i = index" (click)="goToSlide(i)"
+              [class]="getIndicatorClasses(i)"
+              class="w-4 h-4 rounded-full transition-all duration-300 border-2 border-white">
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Search Section -->
+    <section class="py-8 bg-white/60 backdrop-blur-sm border-b border-rose-100">
+      <div class="max-w-4xl mx-auto px-4">
+        <div class="flex flex-col lg:flex-row gap-6 items-center justify-between">
+
+          <!-- Search Box -->
+          <div class="relative flex-1 max-w-md">
+            <div class="relative">
+              <input type="text" [(ngModel)]="searchTerm" (input)="onSearch()" placeholder="Search products..."
+                class="w-full pl-12 pr-10 py-4 border-2 border-rose-200 rounded-2xl focus:outline-none focus:ring-3 focus:ring-rose-200 bg-white/95 transition-all duration-300">
+              <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-rose-600 text-lg"></i>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex gap-4">
+            <button class="flex items-center gap-3 bg-gradient-to-r from-rose-500 to-pink-600 text-white px-6 py-4 rounded-2xl shadow-lg transition-all duration-300 hover:scale-105">
+              <i class="fas fa-plus"></i>
+              <span class="font-semibold">Add Product</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Products Grid -->
+    <section class="max-w-7xl mx-auto px-4 py-12">
+      <div class="text-center mb-12">
+        <h2 class="text-4xl font-bold bg-gradient-to-r from-rose-600 to-pink-700 bg-clip-text text-transparent mb-4">
+          Your Products
+        </h2>
+      </div>
+
+      <!-- Products -->
+      <div *ngIf="filteredProducts.length > 0"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+
+        <div *ngFor="let product of filteredProducts"
+          class="group bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-105 border border-rose-100/50">
+
+          <!-- Product Image -->
+          <div class="p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-t-3xl">
+            <div class="relative h-48 overflow-hidden rounded-2xl">
+              <img [src]="product.image" [alt]="product.name"
+                class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110">
+            </div>
+          </div>
+
+          <!-- Product Details -->
+          <div class="p-6">
+            <span class="text-rose-600 font-semibold text-sm uppercase">{{ product.category }}</span>
+
+            <h4 class="text-xl font-bold text-gray-800 mt-2 line-clamp-2">
+              {{ product.name }}
+            </h4>
+
+            <p class="text-gray-600 mt-3 text-sm leading-relaxed line-clamp-2">
+              {{ product.description }}
+            </p>
+
+            <!-- Price & Stock -->
+            <div class="flex justify-between items-center mt-4">
+              <span class="text-2xl font-bold text-rose-600">
+                ${{ product.price }}
+              </span>
+
+              <div [class]="getStockColor(product.stock) + ' font-semibold flex items-center gap-2 text-sm'">
+                <i [class]="'fas ' + getStockIcon(product.stock)"></i>
+                <span>{{ product.stockText }}</span>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-3 mt-6 pt-4 border-t border-gray-100">
+              <button (click)="editProduct(product.id)"
+                class="flex-1 bg-rose-50 text-rose-600 hover:bg-rose-100 py-2 px-4 rounded-xl transition-all duration-300 font-medium">
+                Edit
+              </button>
+
+              <button (click)="deleteProduct(product.id)"
+                class="flex-1 bg-red-50 text-red-600 hover:bg-red-100 py-2 px-4 rounded-xl transition-all duration-300 font-medium">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="filteredProducts.length === 0" class="text-center py-16">
+        <div class="max-w-md mx-auto">
+          <i class="fas fa-box-open text-8xl text-gray-300 mb-6"></i>
+          <h3 class="text-2xl font-bold text-gray-600 mb-3">
+            {{ searchTerm ? 'No products found' : 'No products yet' }}
+          </h3>
+          <button *ngIf="!searchTerm"
+            class="bg-gradient-to-r from-rose-500 to-pink-600 text-white px-8 py-3 rounded-2xl shadow-lg transition-all duration-300 font-semibold">
+            <i class="fas fa-plus mr-2"></i>
+            Add Your First Product
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Delete Modal -->
+  <div *ngIf="showDeleteModal"
+    class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+
+    <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl">
+      <div class="text-center">
+        <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i class="fas fa-exclamation-triangle text-red-500 text-3xl"></i>
+        </div>
+
+        <h3 class="text-2xl font-bold text-gray-800 mb-3">Delete Product?</h3>
+
+        <p class="text-gray-600 mb-6">
+          Are you sure you want to delete <strong>{{ productToDeleteName }}</strong>?
+        </p>
+      </div>
+
+      <div class="flex gap-4">
+        <button (click)="cancelDelete()"
+          class="flex-1 py-3 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-300 font-semibold">
+          Cancel
+        </button>
+
+        <button (click)="confirmDelete()"
+          class="flex-1 py-3 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-xl transition-all duration-300 font-semibold">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
