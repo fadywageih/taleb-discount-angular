@@ -1,11 +1,9 @@
-<!-- src/app/Components/auth/register-school/register-school.component.html -->
 <div
     class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-indigo-900 to-blue-900 p-4">
     <div class="w-full max-w-4xl animate-fadeIn">
         <div
             class="w-full bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-8 transition-all duration-500 hover:shadow-3xl hover:scale-[1.01] border border-white/20">
             <form (ngSubmit)="onSubmit()" #registerForm="ngForm" class="space-y-6">
-
                 <!-- Header -->
                 <div class="text-center">
                     <div
@@ -18,7 +16,6 @@
                     </h2>
                     <p class="text-gray-600">Join as a school student</p>
                 </div>
-
                 <!-- Error Message -->
                 <div *ngIf="errorMessage" class="p-4 bg-red-50 border border-red-200 rounded-xl animate-shake">
                     <div class="flex items-center">
@@ -26,13 +23,11 @@
                         <span class="text-red-700 font-medium">{{ errorMessage }}</span>
                     </div>
                 </div>
-
                 <!-- Personal Information Section -->
                 <div class="bg-blue-50/50 rounded-2xl p-6 border border-blue-200">
                     <h3 class="text-lg font-semibold text-blue-900 mb-4 flex items-center">
                         <i class="mr-2">👤</i> Personal Information
                     </h3>
-
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <!-- Name -->
                         <div class="space-y-2">
@@ -65,32 +60,25 @@
                                 <div *ngIf="checkingEmail" class="absolute right-3 top-1/2 transform -translate-y-1/2">
                                     <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
                                 </div>
-
                                 <!-- علامة الصح عندما الإيميل متاح -->
                                 <div *ngIf="!checkingEmail && !fieldErrors['email'] && registerData.email && email.valid"
                                     class="absolute right-3 top-1/2 transform -translate-y-1/2">
                                     <i class="text-green-500 text-lg">✅</i>
                                 </div>
-
                                 <!-- علامة الخطأ عندما الإيميل مستخدم -->
                                 <div *ngIf="!checkingEmail && fieldErrors['email'] && registerData.email"
                                     class="absolute right-3 top-1/2 transform -translate-y-1/2">
                                     <i class="text-red-500 text-lg">❌</i>
                                 </div>
                             </div>
-
-                            <!-- رسائل الخطأ -->
                             <div *ngIf="(email.touched || registerData.email) && fieldErrors['email']"
                                 class="text-red-600 text-sm mt-1 font-medium">
                                 {{ fieldErrors['email'] }}
                             </div>
-
-                            <!-- رسالة التحقق -->
                             <div *ngIf="checkingEmail" class="text-blue-600 text-sm mt-1 font-medium flex items-center">
                                 <div class="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-600 mr-2"></div>
                                 Checking email availability...
                             </div>
-
                             <!-- رسالة النجاح -->
                             <div *ngIf="!checkingEmail && !fieldErrors['email'] && registerData.email && email.valid"
                                 class="text-green-600 text-sm mt-1 font-medium flex items-center">
@@ -98,7 +86,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                         <!-- National ID -->
                         <div class="space-y-2">
@@ -116,7 +103,6 @@
                                 {{ fieldErrors['nationalId'] }}
                             </div>
                         </div>
-
                         <!-- Phone -->
                         <div class="space-y-2">
                             <label class="text-sm font-semibold text-gray-700 block">Phone Number</label>
@@ -133,8 +119,6 @@
                                 {{ fieldErrors['phone'] }}
                             </div>
                         </div>
-
-                        <!-- Age -->
                         <div class="space-y-2">
                             <label class="text-sm font-semibold text-gray-700 block">Age</label>
                             <div class="relative">
@@ -152,13 +136,10 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- School Information Section -->
                 <div class="bg-indigo-50/50 rounded-2xl p-6 border border-indigo-200">
                     <h3 class="text-lg font-semibold text-indigo-900 mb-4 flex items-center">
                         <i class="mr-2">🏫</i> School Information
                     </h3>
-
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <!-- School Name -->
                         <div class="space-y-2">
@@ -177,7 +158,6 @@
                                 {{ fieldErrors['schoolName'] }}
                             </div>
                         </div>
-
                         <!-- Grade Level -->
                         <div class="space-y-2">
                             <label class="text-sm font-semibold text-gray-700 block">Grade Level</label>
@@ -195,7 +175,6 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- Address -->
                     <div class="space-y-2 mt-4">
                         <label class="text-sm font-semibold text-gray-700 block">Address</label>
@@ -212,13 +191,11 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Security Section -->
                 <div class="bg-purple-50/50 rounded-2xl p-6 border border-purple-200">
                     <h3 class="text-lg font-semibold text-purple-900 mb-4 flex items-center">
                         <i class="mr-2">🔒</i> Security Information
                     </h3>
-
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <!-- Password -->
                         <div class="space-y-2">
@@ -237,7 +214,6 @@
                                 {{ fieldErrors['password'] }}
                             </div>
                         </div>
-
                         <!-- Confirm Password -->
                         <div class="space-y-2">
                             <label class="text-sm font-semibold text-gray-700 block">Confirm Password</label>
@@ -258,13 +234,11 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- File Upload Section -->
                 <div class="bg-amber-50/50 rounded-2xl p-6 border border-amber-200">
                     <h3 class="text-lg font-semibold text-amber-900 mb-4 flex items-center">
                         <i class="mr-2">📄</i> Document Upload
                     </h3>
-
                     <div class="space-y-2">
                         <label class="text-sm font-semibold text-gray-700 block">
                             <i class="mr-2">📄</i> Birth Certificate
@@ -280,7 +254,6 @@
                         </p>
                     </div>
                 </div>
-
                 <button type="submit"
                     [disabled]="!registerForm.form.valid || isLoading || checkingEmail || !emailChecked"
                     class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold rounded-xl cursor-pointer transition-all duration-300 hover:from-blue-700 hover:to-indigo-800 hover:scale-[1.02] shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-lg">
@@ -314,7 +287,6 @@
         </div>
     </div>
 </div>
-
 <style>
     .animate-fadeIn {
         animation: fadeIn 0.6s ease-out;
@@ -323,19 +295,16 @@
     .animate-shake {
         animation: shake 0.5s ease-in-out;
     }
-
     @keyframes fadeIn {
         from {
             opacity: 0;
             transform: translateY(20px);
         }
-
         to {
             opacity: 1;
             transform: translateY(0);
         }
     }
-
     @keyframes shake {
 
         0%,

@@ -12,6 +12,8 @@ import { ResetPassword } from './Components/auth/reset-password/reset-password';
 import { VendorHome } from './Components/vendor/vendor-home/vendor-home';
 import { VendorEdit } from './Components/vendor/vendor-edit/vendor-edit';
 import { vendorGuard } from './guards/vendor.guard';
+import { CreateProduct } from './Components/Product/create-product/create-product';
+import { EditProduct } from './Components/Product/edit-product/edit-product';
 
 export const routes: Routes = [
   { path: '', component: Cover },
@@ -27,6 +29,8 @@ export const routes: Routes = [
   // Vendor Routes مع VendorGuard
   { path: 'vendor/home', component: VendorHome, canActivate: [vendorGuard] },
   { path: 'vendor/edit', component: VendorEdit, canActivate: [vendorGuard] },
+  { path: 'vendor/products/create', component: CreateProduct, canActivate: [vendorGuard] },
+  {path: 'vendor/products/edit/:id',component: EditProduct,canActivate: [vendorGuard]},
 ];
 
 @NgModule({

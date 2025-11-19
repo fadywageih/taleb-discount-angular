@@ -1,11 +1,9 @@
-// src/app/Components/auth/register-university/register-university.component.ts
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AccountService } from '../../../Services/account/account-service';
 import { ValidationService } from '../../../Services/validation/validation.service';
-
 @Component({
   selector: 'app-register-university',
   imports: [CommonModule, FormsModule, RouterLink],
@@ -26,20 +24,17 @@ export class RegisterUniversity {
     phone: '',
     nationalIdFile: new File([], 'empty')
   };
-  
   isLoading = false;
   errorMessage = '';
   fieldErrors: { [key: string]: string } = {};
   checkingEmail = false;
   emailChecked = false;
   emailCheckInProgress = false;
-
   constructor(
     private accountService: AccountService,
     private validationService: ValidationService,
     private router: Router
   ) {}
-
   validateField(fieldName: string, value: any): string {
     switch (fieldName) {
       case 'email':
@@ -90,24 +85,18 @@ export class RegisterUniversity {
 
   onFieldChange(fieldName: string, value: any) {
     this.fieldErrors[fieldName] = this.validateField(fieldName, value);
-    
-    // التحقق من الإيميل في الداتا بيز إذا كان صحيحاً
     if (fieldName === 'email' && !this.fieldErrors['email'] && value && !this.emailCheckInProgress) {
       this.checkEmailExists(value);
     }
   }
-
   async checkEmailExists(email: string) {
-    // منع الـ duplicate checks
     if (this.emailCheckInProgress) {
       console.log('Email check already in progress, skipping...');
       return;
     }
-
     this.emailCheckInProgress = true;
     this.checkingEmail = true;
     this.emailChecked = false;
-    
     try {
       const exists = await this.validationService.checkEmailExists(email).toPromise();
       if (exists) {
@@ -125,7 +114,6 @@ export class RegisterUniversity {
       this.emailCheckInProgress = false;
     }
   }
-
   getInputClass(field: any, fieldName: string): string {
     const baseClass = 'w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 bg-white transition-all duration-300';
     
@@ -191,37 +179,23 @@ export class RegisterUniversity {
   onSubmit() {
     if (this.isLoading) return;
 
-    console.log('=== BEFORE SUBMISSION ===');
-    console.log('Email checked:', this.emailChecked);
-    console.log('Checking email:', this.checkingEmail);
-    console.log('Form valid:', this.isFormValid());
-
-    // استخدام الـ state الحالي بدون أي عمليات إضافية
     if (!this.isFormValid()) {
       this.errorMessage = 'Please fix all validation errors before submitting';
-      
       const errorFields = Object.keys(this.fieldErrors).filter(key => this.fieldErrors[key] !== '');
       if (errorFields.length > 0) {
         console.log('Fields with errors:', errorFields);
         this.errorMessage += ': ' + errorFields.join(', ');
       }
-      
       if (this.checkingEmail) {
         this.errorMessage = 'Please wait for email verification to complete';
       }
-      
       if (!this.emailChecked && this.registerData.email && !this.fieldErrors['email']) {
         this.errorMessage = 'Email verification is required. Please wait...';
       }
-      
       return;
     }
-
     this.isLoading = true;
     this.errorMessage = '';
-
-    console.log('✅ Form is valid, submitting...');
-
     this.accountService.registerUniversity(this.registerData).subscribe({
       next: (user) => {
         this.isLoading = false;

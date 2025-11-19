@@ -1,3 +1,4 @@
+<!-- src/app/Components/vendor/vendor-home/vendor-home.html -->
 <div class="min-h-screen bg-gradient-to-br from-rose-50 via-white to-pink-100">
   <app-vendor-header></app-vendor-header>
 
@@ -15,10 +16,7 @@
     <section class="py-8 px-4">
       <div class="max-w-6xl mx-auto">
         <div class="relative rounded-3xl overflow-hidden shadow-2xl bg-white border-2 border-white/20">
-
-          <!-- Slides Container -->
           <div class="relative h-80 md:h-96 lg:h-[500px] overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
-
             <!-- Slides -->
             <div *ngFor="let image of sliderImages; let i = index" [class]="getSlideClasses(i)" class="cursor-pointer">
               <img [src]="getImageUrl(image)"
@@ -73,7 +71,6 @@
     <section class="py-8 bg-white/60 backdrop-blur-sm border-b border-rose-100">
       <div class="max-w-4xl mx-auto px-4">
         <div class="flex flex-col lg:flex-row gap-6 items-center justify-between">
-
           <!-- Search Box -->
           <div class="relative flex-1 max-w-md">
             <div class="relative">
@@ -85,7 +82,8 @@
 
           <!-- Action Buttons -->
           <div class="flex gap-4">
-            <button class="flex items-center gap-3 bg-gradient-to-r from-rose-500 to-pink-600 text-white px-6 py-4 rounded-2xl shadow-lg transition-all duration-300 hover:scale-105">
+            <button (click)="addProduct()" 
+                    class="flex items-center gap-3 bg-gradient-to-r from-rose-500 to-pink-600 text-white px-6 py-4 rounded-2xl shadow-lg transition-all duration-300 hover:scale-105">
               <i class="fas fa-plus"></i>
               <span class="font-semibold">Add Product</span>
             </button>
@@ -100,45 +98,52 @@
         <h2 class="text-4xl font-bold bg-gradient-to-r from-rose-600 to-pink-700 bg-clip-text text-transparent mb-4">
           Your Products
         </h2>
+        <p class="text-gray-600 text-lg">Manage your product inventory</p>
+      </div>
+
+      <!-- Products Loading -->
+      <div *ngIf="productsLoading" class="text-center py-16">
+        <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-rose-600 mx-auto mb-4"></div>
+        <p class="text-gray-600">Loading products...</p>
       </div>
 
       <!-- Products -->
-      <div *ngIf="filteredProducts.length > 0"
+      <div *ngIf="!productsLoading && filteredProducts.length > 0"
         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-
         <div *ngFor="let product of filteredProducts"
           class="group bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-105 border border-rose-100/50">
-
           <!-- Product Image -->
           <div class="p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-t-3xl">
             <div class="relative h-48 overflow-hidden rounded-2xl">
-              <img [src]="product.image" [alt]="product.name"
+              <img [src]="getImageUrl(product.pictureUrl)" [alt]="product.name"
                 class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110">
             </div>
           </div>
 
           <!-- Product Details -->
           <div class="p-6">
-            <span class="text-rose-600 font-semibold text-sm uppercase">{{ product.category }}</span>
-
-            <h4 class="text-xl font-bold text-gray-800 mt-2 line-clamp-2">
-              {{ product.name }}
-            </h4>
-
-            <p class="text-gray-600 mt-3 text-sm leading-relaxed line-clamp-2">
-              {{ product.description }}
-            </p>
+            <span class="text-rose-600 font-semibold text-sm uppercase">{{ product.categoryName }}</span>
+            <h4 class="text-xl font-bold text-gray-800 mt-2 line-clamp-2">{{ product.name }}</h4>
+            <p class="text-gray-600 mt-3 text-sm leading-relaxed line-clamp-2">{{ product.description }}</p>
 
             <!-- Price & Stock -->
             <div class="flex justify-between items-center mt-4">
-              <span class="text-2xl font-bold text-rose-600">
-                ${{ product.price }}
-              </span>
-
-              <div [class]="getStockColor(product.stock) + ' font-semibold flex items-center gap-2 text-sm'">
-                <i [class]="'fas ' + getStockIcon(product.stock)"></i>
-                <span>{{ product.stockText }}</span>
+              <span class="text-2xl font-bold text-rose-600">${{ product.price }}</span>
+              <div *ngIf="product.discountPrice" class="text-sm text-gray-500 line-through">
+                ${{ product.discountPrice }}
               </div>
+              <div [class]="getStockStatus(product).color + ' font-semibold flex items-center gap-2 text-sm'">
+                <i [class]="'fas ' + getStockStatus(product).icon"></i>
+                <span>{{ getStockStatus(product).text }}</span>
+              </div>
+            </div>
+
+            <!-- Vendor Info -->
+            <div class="mt-3 pt-3 border-t border-gray-100">
+              <p class="text-sm text-gray-500">
+                <i class="fas fa-store mr-1"></i>
+                {{ product.vendorName }}
+              </p>
             </div>
 
             <!-- Action Buttons -->
@@ -147,7 +152,6 @@
                 class="flex-1 bg-rose-50 text-rose-600 hover:bg-rose-100 py-2 px-4 rounded-xl transition-all duration-300 font-medium">
                 Edit
               </button>
-
               <button (click)="deleteProduct(product.id)"
                 class="flex-1 bg-red-50 text-red-600 hover:bg-red-100 py-2 px-4 rounded-xl transition-all duration-300 font-medium">
                 Delete
@@ -158,14 +162,17 @@
       </div>
 
       <!-- Empty State -->
-      <div *ngIf="filteredProducts.length === 0" class="text-center py-16">
+      <div *ngIf="!productsLoading && filteredProducts.length === 0" class="text-center py-16">
         <div class="max-w-md mx-auto">
           <i class="fas fa-box-open text-8xl text-gray-300 mb-6"></i>
           <h3 class="text-2xl font-bold text-gray-600 mb-3">
             {{ searchTerm ? 'No products found' : 'No products yet' }}
           </h3>
-          <button *ngIf="!searchTerm"
-            class="bg-gradient-to-r from-rose-500 to-pink-600 text-white px-8 py-3 rounded-2xl shadow-lg transition-all duration-300 font-semibold">
+          <p class="text-gray-500 mb-6" *ngIf="!searchTerm">
+            Start by adding your first product to showcase in your store
+          </p>
+          <button *ngIf="!searchTerm" (click)="addProduct()"
+                  class="bg-gradient-to-r from-rose-500 to-pink-600 text-white px-8 py-3 rounded-2xl shadow-lg transition-all duration-300 font-semibold">
             <i class="fas fa-plus mr-2"></i>
             Add Your First Product
           </button>
@@ -177,26 +184,21 @@
   <!-- Delete Modal -->
   <div *ngIf="showDeleteModal"
     class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-
     <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl">
       <div class="text-center">
         <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <i class="fas fa-exclamation-triangle text-red-500 text-3xl"></i>
         </div>
-
         <h3 class="text-2xl font-bold text-gray-800 mb-3">Delete Product?</h3>
-
         <p class="text-gray-600 mb-6">
-          Are you sure you want to delete <strong>{{ productToDeleteName }}</strong>?
+          Are you sure you want to delete <strong>"{{ productToDeleteName }}"</strong>? This action cannot be undone.
         </p>
       </div>
-
       <div class="flex gap-4">
         <button (click)="cancelDelete()"
           class="flex-1 py-3 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-300 font-semibold">
           Cancel
         </button>
-
         <button (click)="confirmDelete()"
           class="flex-1 py-3 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-xl transition-all duration-300 font-semibold">
           Delete

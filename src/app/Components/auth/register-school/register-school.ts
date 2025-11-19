@@ -25,13 +25,12 @@ export class RegisterSchool {
     phone: '',
     birthCertificateFile: new File([], 'empty') 
   };
-  
   isLoading = false;
   errorMessage = '';
   fieldErrors: { [key: string]: string } = {};
   checkingEmail = false;
   emailChecked = false;
-  emailCheckInProgress = false; // علشان نمنع الـ duplicate checks
+  emailCheckInProgress = false;
 
   constructor(
     private accountService: AccountService,
@@ -84,15 +83,11 @@ export class RegisterSchool {
 
   onFieldChange(fieldName: string, value: any) {
     this.fieldErrors[fieldName] = this.validateField(fieldName, value);
-    
-    // التحقق من الإيميل في الداتا بيز إذا كان صحيحاً
     if (fieldName === 'email' && !this.fieldErrors['email'] && value && !this.emailCheckInProgress) {
       this.checkEmailExists(value);
     }
   }
-
   async checkEmailExists(email: string) {
-    // منع الـ duplicate checks
     if (this.emailCheckInProgress) {
       console.log('Email check already in progress, skipping...');
       return;
@@ -101,7 +96,6 @@ export class RegisterSchool {
     this.emailCheckInProgress = true;
     this.checkingEmail = true;
     this.emailChecked = false;
-    
     try {
       const exists = await this.validationService.checkEmailExists(email).toPromise();
       if (exists) {
@@ -189,7 +183,6 @@ export class RegisterSchool {
     console.log('Checking email:', this.checkingEmail);
     console.log('Form valid:', this.isFormValid());
 
-    // بدل ما نعمل validation تاني، نستخدم الـ state الحالي
     if (!this.isFormValid()) {
       this.errorMessage = 'Please fix all validation errors before submitting';
       
@@ -198,23 +191,16 @@ export class RegisterSchool {
         console.log('Fields with errors:', errorFields);
         this.errorMessage += ': ' + errorFields.join(', ');
       }
-      
-      // إذا المشكلة إن الـ email check مازال شغال
       if (this.checkingEmail) {
         this.errorMessage = 'Please wait for email verification to complete';
       }
-      
-      // إذا المشكلة إن الـ email check ماعملش بعد
       if (!this.emailChecked && this.registerData.email && !this.fieldErrors['email']) {
         this.errorMessage = 'Please wait for email verification to complete';
       }
-      
       return;
     }
-
     this.isLoading = true;
     this.errorMessage = '';
-
     console.log('Submitting form...');
 
     this.accountService.registerSchool(this.registerData).subscribe({

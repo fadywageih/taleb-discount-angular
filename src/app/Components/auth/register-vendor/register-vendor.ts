@@ -151,16 +151,8 @@ export class RegisterVendor {
     
     return hasNoFieldErrors && allRequiredFieldsFilled && this.emailChecked && !this.checkingEmail;
   }
-
   onSubmit() {
     if (this.isLoading) return;
-
-    console.log('=== BEFORE SUBMISSION ===');
-    console.log('Email checked:', this.emailChecked);
-    console.log('Checking email:', this.checkingEmail);
-    console.log('Form valid:', this.isFormValid());
-
-    // استخدام الـ state الحالي بدون أي عمليات إضافية
     if (!this.isFormValid()) {
       this.errorMessage = 'Please fix all validation errors before submitting';
       
@@ -180,18 +172,11 @@ export class RegisterVendor {
       
       return;
     }
-
     this.isLoading = true;
     this.errorMessage = '';
-
-    console.log('✅ Form is valid, submitting...');
-
     this.accountService.registerVendor(this.registerData).subscribe({
       next: (user) => {
         this.isLoading = false;
-        console.log('🎉 Registration successful:', user);
-        
-        // تغيير هذا السطر: توجيه إلى VendorHome بدلاً من Home
         this.router.navigate(['/vendor/home']);
       },
       error: (error) => {

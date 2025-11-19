@@ -1,26 +1,19 @@
+// src/app/Components/vendor/vendor-home/vendor-home.ts
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { VendorService } from '../../../Services/vendor/vendor.service';
-import { VendorDto } from '../../../core';
+import { ProductService } from '../../../Services/Product/product-service';
+import { VendorDto, ProductResultDto } from '../../../core';
 import { VendorHeader } from '../vendor-header/vendor-header';
-
-interface Product {
-  id: number;
-  name: string;
-  category: string;
-  description: string;
-  price: number;
-  image: string;
-  stock: 'in-stock' | 'low-stock' | 'out-of-stock';
-  stockText: string;
-}
 
 @Component({
   selector: 'app-vendor-home',
   templateUrl: './vendor-home.html',
-  imports: [CommonModule, FormsModule, VendorHeader]
+  styleUrls: ['./vendor-home.css'],
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterModule, VendorHeader]
 })
 export class VendorHome implements OnInit, OnDestroy {
   vendorData: VendorDto = {
@@ -37,66 +30,27 @@ export class VendorHome implements OnInit, OnDestroy {
     branches: []
   };
 
+  products: ProductResultDto[] = [];
   currentSlide = 0;
   private slideInterval: any;
   searchTerm = '';
   showDeleteModal = false;
   productToDelete: number | null = null;
   isLoading = true;
+  productsLoading = true;
+  errorMessage = '';
 
   defaultSliderImage = 'assets/Images/Slider.png';
 
-  products: Product[] = [
-    {
-      id: 1,
-      name: 'Wireless Headphones',
-      category: 'Electronics',
-      description: 'Premium noise-cancelling wireless headphones',
-      price: 79.99,
-      image: 'assets/images/product-1.png',
-      stock: 'in-stock',
-      stockText: 'In Stock'
-    },
-    {
-      id: 2,
-      name: 'Smart Coffee Maker',
-      category: 'Home & Kitchen',
-      description: 'Programmable coffee maker with app control',
-      price: 129.99,
-      image: 'assets/images/product-2.png',
-      stock: 'low-stock',
-      stockText: 'Only 3 Left'
-    }
-  ];
-
-  get sliderImages(): string[] {
-    if (this.hasVendorImages) {
-      const validImages = (this.vendorData.businessImages || [])
-        .filter(img => img && img.trim() !== '')
-        .slice(0, 5);
-      return validImages;
-    }
-    return new Array(5).fill(this.defaultSliderImage);
-  }
-
-  get hasVendorImages(): boolean {
-    const businessImages = this.vendorData.businessImages || [];
-    return businessImages.length > 0 && businessImages.some(img => img && img.trim() !== '');
-  }
-
-  get productToDeleteName(): string {
-    if (!this.productToDelete) return '';
-    const product = this.products.find(p => p.id === this.productToDelete);
-    return product ? product.name : '';
-  }
-
   constructor(
     private vendorService: VendorService,
+    private productService: ProductService,
     private router: Router
   ) { }
 
   ngOnInit() {
     this.loadVendorData();
+    this.loadVendorProducts();
     this.startAutoSlide();
   }
 
@@ -115,16 +69,52 @@ export class VendorHome implements OnInit, OnDestroy {
         this.isLoading = false;
       },
       error: (error) => {
+        console.error('Error loading vendor data:', error);
+        this.errorMessage = error.message;
         this.isLoading = false;
       }
     });
+  }
+
+  loadVendorProducts() {
+    this.productsLoading = true;
+    this.productService.getVendorProducts().subscribe({
+      next: (products) => {
+        this.products = products;
+        this.productsLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading products:', error);
+        this.errorMessage = error.message;
+        this.productsLoading = false;
+      }
+    });
+  }
+
+  addProduct(): void {
+    this.router.navigate(['/vendor/products/create']);
   }
 
   goToEdit(): void {
     this.router.navigate(['/vendor/edit']);
   }
 
-  // Slider Methods
+  // Slider Methods - نفس الكود اللي عندك
+  get sliderImages(): string[] {
+    if (this.hasVendorImages) {
+      const validImages = (this.vendorData.businessImages || [])
+        .filter(img => img && img.trim() !== '')
+        .slice(0, 5);
+      return validImages;
+    }
+    return new Array(5).fill(this.defaultSliderImage);
+  }
+
+  get hasVendorImages(): boolean {
+    const businessImages = this.vendorData.businessImages || [];
+    return businessImages.length > 0 && businessImages.some(img => img && img.trim() !== '');
+  }
+
   startAutoSlide(): void {
     this.slideInterval = setInterval(() => {
       this.nextSlide();
@@ -172,7 +162,7 @@ export class VendorHome implements OnInit, OnDestroy {
 
   // Search Methods
   onSearch(): void {
-    // Search logic here
+    // Search logic
   }
 
   clearSearch(): void {
@@ -187,9 +177,19 @@ export class VendorHome implements OnInit, OnDestroy {
 
   confirmDelete(): void {
     if (this.productToDelete) {
-      this.products = this.products.filter(product => product.id !== this.productToDelete);
-      this.showDeleteModal = false;
-      this.productToDelete = null;
+      this.productService.deleteProduct(this.productToDelete).subscribe({
+        next: () => {
+          this.products = this.products.filter(product => product.id !== this.productToDelete);
+          this.showDeleteModal = false;
+          this.productToDelete = null;
+        },
+        error: (error) => {
+          console.error('Error deleting product:', error);
+          this.errorMessage = error.message;
+          this.showDeleteModal = false;
+          this.productToDelete = null;
+        }
+      });
     }
   }
 
@@ -199,36 +199,43 @@ export class VendorHome implements OnInit, OnDestroy {
   }
 
   editProduct(productId: number): void {
-    // Edit product logic
+    this.router.navigate(['/vendor/products/edit', productId]);
   }
 
   // Utility Methods
-  getStockColor(stockStatus: string): string {
-    switch (stockStatus) {
-      case 'in-stock': return 'text-green-600';
-      case 'low-stock': return 'text-yellow-600';
-      case 'out-of-stock': return 'text-red-600';
-      default: return 'text-gray-600';
+  getStockStatus(product: ProductResultDto): { status: string, text: string, color: string, icon: string } {
+    if (product.quantity > 10) {
+      return { 
+        status: 'in-stock', 
+        text: 'In Stock', 
+        color: 'text-green-600', 
+        icon: 'fa-check-circle' 
+      };
+    } else if (product.quantity > 0) {
+      return { 
+        status: 'low-stock', 
+        text: `Only ${product.quantity} Left`, 
+        color: 'text-yellow-600', 
+        icon: 'fa-exclamation-circle' 
+      };
+    } else {
+      return { 
+        status: 'out-of-stock', 
+        text: 'Out of Stock', 
+        color: 'text-red-600', 
+        icon: 'fa-times-circle' 
+      };
     }
   }
 
-  getStockIcon(stockStatus: string): string {
-    switch (stockStatus) {
-      case 'in-stock': return 'fa-check-circle';
-      case 'low-stock': return 'fa-exclamation-circle';
-      case 'out-of-stock': return 'fa-times-circle';
-      default: return 'fa-question-circle';
-    }
-  }
-
-  get filteredProducts(): Product[] {
+  get filteredProducts(): ProductResultDto[] {
     if (!this.searchTerm.trim()) {
       return this.products;
     }
     const term = this.searchTerm.toLowerCase();
     return this.products.filter(product =>
       product.name.toLowerCase().includes(term) ||
-      product.category.toLowerCase().includes(term)
+      product.categoryName.toLowerCase().includes(term)
     );
   }
 
@@ -258,4 +265,10 @@ export class VendorHome implements OnInit, OnDestroy {
     
     return this.defaultSliderImage;
   }
-}
+
+  get productToDeleteName(): string {
+    if (!this.productToDelete) return '';
+    const product = this.products.find(p => p.id === this.productToDelete);
+    return product ? product.name : '';
+  }
+} 
