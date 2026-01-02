@@ -1,0 +1,91 @@
+.split-letters-container {
+  perspective: 1000px;
+}
+.split-letter {
+  display: inline-block;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6, #3b82f6);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  opacity: 0;
+  animation: popIn 0.5s ease forwards, gradientShift 3s ease-in-out infinite;
+}
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) rotateX(-90deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotateX(0);
+  }
+}
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% center;
+  }
+  50% {
+    background-position: 100% center;
+  }
+}
+.animate-fade-in {
+  animation: fadeIn 1s ease 0.5s forwards;
+  opacity: 0;
+}
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+.founder-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+.founder-card {
+  transition: all 0.3s ease;
+}
+.rtl-text {
+  direction: rtl;
+  text-align: right;
+  line-height: 1.8;
+}
+.gradient-bg {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+.glow-effect {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+@media (max-width: 768px) {
+  .founder-card {
+    max-width: 300px;
+    margin: 0 auto;
+  }
+  .impact-card {
+    padding: 1.5rem;
+  }
+}
+.quote-mark {
+  position: relative;
+  display: inline-block;
+}
+.quote-mark::before {
+  content: '"';
+  position: absolute;
+  left: -20px;
+  top: -10px;
+  font-size: 4rem;
+  color: rgba(59, 130, 246, 0.2);
+  font-family: serif;
+}
+.bullet-point {
+  position: relative;
+  padding-left: 1.5rem;
+}
+.bullet-point::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #3b82f6;
+  font-size: 1.5rem;
+}

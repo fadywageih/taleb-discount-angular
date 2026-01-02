@@ -1,21 +1,11 @@
 // src/app/Components/Product/edit-product/edit-product.ts
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { VendorDto, ProductResultDto } from '../../../core';
 import { ProductService } from '../../../Services/Product/product-service';
 import { VendorService } from '../../../Services/vendor/vendor.service';
-
-// تعريف الـ Categories الثابتة
-const STATIC_CATEGORIES = [
-  { id: 1, name: 'Supplies' },
-  { id: 2, name: 'Technology' },
-  { id: 3, name: 'Medical' },
-  { id: 4, name: 'Engineering' },
-  { id: 5, name: 'Workspaces' },
-  { id: 6, name: 'Uniform' }
-];
+import { ProductResultDto, VendorDto } from '../../../core';
 
 @Component({
   selector: 'app-edit-product',
@@ -26,36 +16,55 @@ const STATIC_CATEGORIES = [
 })
 export class EditProduct implements OnInit {
   productForm: FormGroup;
-  categories = STATIC_CATEGORIES;
+  productId: number;
+  currentImageUrl: string = 'assets/Images/default-product.jpg';
   selectedFile: File | null = null;
-  currentImageUrl: string = '';
   isSubmitting = false;
-  isLoading = true;
+  isLoading = true; 
   errorMessage = '';
   successMessage = '';
-  vendorData: VendorDto | null = null;
-  productId!: number;
+  vendorData: VendorDto | null = null; 
+
+  categories = [
+    { id: 1, name: 'Supplies' },
+    { id: 2, name: 'Technology' },
+    { id: 3, name: 'Medical' },
+    { id: 4, name: 'Engineering' },
+    { id: 5, name: 'Workspaces' },
+    { id: 6, name: 'Uniform' }
+  ];
 
   constructor(
     private fb: FormBuilder,
     private productService: ProductService,
-    private vendorService: VendorService,
-    private router: Router,
-    private route: ActivatedRoute
+    private vendorService: VendorService, 
+    private route: ActivatedRoute,
+    private router: Router
   ) {
+    this.productId = +this.route.snapshot.params['id'];
     this.productForm = this.createForm();
   }
 
   ngOnInit(): void {
-    this.productId = +this.route.snapshot.paramMap.get('id')!;
     this.loadVendorData();
-    this.loadProductData();
+    this.loadProduct();
+  }
+
+  loadVendorData(): void {
+    this.vendorService.getVendorProfile().subscribe({
+      next: (vendor: VendorDto) => {
+        this.vendorData = vendor;
+      },
+      error: (error: any) => {
+        console.error('Error loading vendor data:', error);
+      }
+    });
   }
 
   createForm(): FormGroup {
     return this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
-      description: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
+      name: ['', [Validators.required, Validators.minLength(3)]],
+      description: ['', [Validators.required, Validators.minLength(10)]],
       price: [0, [Validators.required, Validators.min(0.01)]],
       discountPrice: [0, [Validators.min(0)]],
       quantity: [0, [Validators.required, Validators.min(0)]],
@@ -66,101 +75,67 @@ export class EditProduct implements OnInit {
     });
   }
 
-  loadVendorData(): void {
-    this.vendorService.getVendorProfile().subscribe({
-      next: (vendor: VendorDto) => {
-        this.vendorData = vendor;
-      },
-      error: (error: any) => {
-        console.error('Error loading vendor data:', error);
-        this.errorMessage = 'Failed to load vendor information';
-      }
-    });
-  }
-
-  loadProductData(): void {
-    this.isLoading = true;
+  loadProduct(): void {
     this.productService.getProductById(this.productId).subscribe({
       next: (product: ProductResultDto) => {
-        console.log('Product data loaded:', product);
-        this.populateForm(product);
-        this.currentImageUrl = this.getImageUrl(product.pictureUrl);
+        this.initializeForm(product);
         this.isLoading = false;
       },
-      error: (error: any) => {
+      error: (error) => {
         console.error('Error loading product:', error);
-        this.errorMessage = 'Failed to load product details';
+        this.errorMessage = 'Failed to load product';
         this.isLoading = false;
       }
     });
   }
 
-  populateForm(product: ProductResultDto): void {
-    this.productForm.patchValue({
-      name: product.name,
-      description: product.description,
-      price: product.price,
-      discountPrice: product.discountPrice || 0,
-      quantity: product.quantity,
-      categoryId: this.getCategoryIdFromName(product.categoryName),
-      address: product.address,
-      restockDueDate: product.restockDueDate ? this.formatDate(product.restockDueDate) : '',
-      isActive: product.isActive
+  private initializeForm(product: ProductResultDto): void {
+    this.currentImageUrl = this.getImageUrl(product.pictureUrl || '');
+    
+    this.productForm = this.fb.group({
+      name: [product.name, [Validators.required, Validators.minLength(3)]],
+      description: [product.description, [Validators.required, Validators.minLength(10)]],
+      price: [product.price, [Validators.required, Validators.min(0.01)]],
+      discountPrice: [product.discountPrice || 0, [Validators.min(0)]],
+      quantity: [product.quantity, [Validators.required, Validators.min(0)]],
+      categoryId: [this.getCategoryIdFromName(product.categoryName || ''), Validators.required],
+      address: [product.address, [Validators.required, Validators.minLength(5)]],
+      restockDueDate: [(product as any).restockDueDate ? this.formatDate((product as any).restockDueDate) : ''],
+      isActive: [product.isActive]
     });
   }
 
-  getCategoryIdFromName(categoryName: string): number {
-    const category = this.categories.find(cat => cat.name === categoryName);
-    return category ? category.id : 1; // Default to first category if not found
+  private getImageUrl(pictureUrl: string): string {
+    if (!pictureUrl) {
+      return 'assets/Images/default-product.jpg';
+    }
+    
+    if (pictureUrl.startsWith('http') || pictureUrl.startsWith('/') || pictureUrl.startsWith('assets/')) {
+      return pictureUrl;
+    }
+    
+    return pictureUrl;
   }
 
-  formatDate(date: any): string {
-    if (!date) return '';
-    const d = new Date(date);
-    return d.toISOString().split('T')[0];
+  private getCategoryIdFromName(categoryName: string): number {
+    const category = this.categories.find(c => c.name === categoryName);
+    return category?.id || 1;
   }
 
-  getImageUrl(imagePath: string): string {
-    if (!imagePath || imagePath.trim() === '') {
-      return 'assets/Images/Slider.png';
-    }
-    
-    if (imagePath.startsWith('data:image')) {
-      return imagePath;
-    }
-    
-    if (imagePath.startsWith('/')) {
-      return `https://localhost:7233${imagePath}`;
-    }
-    
-    if (imagePath.startsWith('http')) {
-      return imagePath;
-    }
-    
-    return 'assets/Images/Slider.png';
+  private formatDate(dateString: string): string {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0];
   }
 
   onFileSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-      if (!allowedTypes.includes(file.type)) {
-        this.errorMessage = 'Please select a valid image file (JPEG, PNG, GIF, WebP)';
-        return;
-      }
-
-      if (file.size > 5 * 1024 * 1024) {
-        this.errorMessage = 'Image size should be less than 5MB';
-        return;
-      }
-
       this.selectedFile = file;
-      this.errorMessage = '';
     }
   }
-
   removeCurrentImage(): void {
-    this.currentImageUrl = '';
+    this.currentImageUrl = 'assets/Images/default-product.jpg';
     this.selectedFile = null;
   }
 
@@ -172,10 +147,6 @@ export class EditProduct implements OnInit {
 
       const formData = new FormData();
       
-      // إضافة الـ ID أولاً
-      formData.append('id', this.productId.toString());
-      
-      // إضافة كل الحقول للـ FormData
       Object.keys(this.productForm.value).forEach(key => {
         const value = this.productForm.value[key];
         if (value !== null && value !== undefined && value !== '') {
@@ -183,7 +154,6 @@ export class EditProduct implements OnInit {
         }
       });
 
-      // إضافة الصورة إذا موجودة
       if (this.selectedFile) {
         formData.append('image', this.selectedFile);
       }
@@ -192,15 +162,13 @@ export class EditProduct implements OnInit {
         next: () => {
           this.isSubmitting = false;
           this.successMessage = 'Product updated successfully!';
-          
           setTimeout(() => {
             this.router.navigate(['/vendor/home']);
           }, 2000);
         },
-        error: (error: any) => {
+        error: (error) => {
           this.isSubmitting = false;
           this.errorMessage = error.message || 'Failed to update product';
-          console.error('Error updating product:', error);
         }
       });
     } else {
@@ -223,12 +191,11 @@ export class EditProduct implements OnInit {
     return !!(field && field.invalid && field.touched);
   }
 
-  getFieldError(fieldName: string): string {
+  getFieldError(fieldName: string): string {  
     const field = this.productForm.get(fieldName);
     if (field?.errors) {
       if (field.errors['required']) return 'This field is required';
       if (field.errors['minlength']) return `Minimum length is ${field.errors['minlength'].requiredLength}`;
-      if (field.errors['maxlength']) return `Maximum length is ${field.errors['maxlength'].requiredLength}`;
       if (field.errors['min']) return `Minimum value is ${field.errors['min'].min}`;
     }
     return '';

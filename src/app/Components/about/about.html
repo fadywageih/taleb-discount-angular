@@ -1,0 +1,165 @@
+<app-header></app-header>
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+  <section class="relative py-12">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-8">
+        <div class="split-letters-container mb-4">
+          <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold">
+            <span *ngFor="let letter of splitLetters; let i = index"
+                  class="split-letter"
+                  [style.animation-delay]="letter.delays">
+              {{letter.isSpace ? '&nbsp;' : letter.char}}
+            </span>
+          </h1>
+        </div>
+        <p class="text-2xl md:text-3xl font-bold text-blue-600 mb-4">
+          "One Click, Countless Student Savings!"
+        </p>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto animate-fade-in">
+          Some Students Help other Students
+        </p>
+      </div>
+      <div class="max-w-4xl mx-auto mt-12">
+        <div class="rounded-2xl overflow-hidden shadow-2xl">
+          <img 
+            src="assets/Images/Slider-2.jpg" 
+            alt="Student Community"
+            class="w-full h-96 object-cover hover:scale-105 transition-transform duration-700">
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="container mx-auto px-4 py-16">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-12">
+        <h2 class="text-4xl font-bold text-gray-800 mb-4">Who Are We?</h2>
+        <p class="text-2xl text-blue-600 font-semibold mb-6">The Story Behind StudentDiscount</p>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div>
+          <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8 shadow-lg">
+            <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+              Built by students, for students
+            </h3>
+            <div class="space-y-6">
+              <p class="text-lg text-gray-700 leading-relaxed">
+                <strong>Taleb Discount</strong> was born out of a shared struggle to afford the rising cost of educational supplies. Six co-founders came together with one mission: to make learning more affordable by connecting students to real, verified discounts.
+              </p>
+              <p class="text-lg text-gray-700 leading-relaxed">
+                We're not just a website. We're a growing community of students and vendors working to make student life easier. From sketchbooks to lab coats, our platform helps you find what you need — for less — based on your major and level.
+              </p>
+              <div class="flex items-center justify-center gap-4 mt-8">
+                <div class="bg-blue-600 text-white px-6 py-2 rounded-full font-bold">
+                  6 Co-founders
+                </div>
+                <div class="bg-purple-600 text-white px-6 py-2 rounded-full font-bold">
+                  Student-Led
+                </div>
+                <div class="bg-green-600 text-white px-6 py-2 rounded-full font-bold">
+                  Community First
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-8 shadow-lg border border-blue-100">
+            <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+              أسّسه طلاب من أجل الطلاب
+            </h3>
+            <div class="space-y-6">
+              <p class="text-lg text-gray-700 leading-relaxed text-right">
+                تأسس <strong>موقع طالب ديسكاونت</strong> من معاناة مشتركة في مواجهة الارتفاع المستمر في تكاليف المستلزمات الدراسية. اجتمع ستة مؤسسين طلاب على هدف واحد: جعل التعلّم أكثر توفيرًا من خلال ربط الطلاب بخصومات حقيقية ومُعتمدة.
+              </p>
+              <p class="text-lg text-gray-700 leading-relaxed text-right">
+                نحن لسنا مجرد موقع إلكتروني، بل مجتمع متنامٍ من الطلاب والبائعين وأصحاب الرؤية، نعمل جميعًا لتسهيل حياة الطالب. من كراسات الرسم إلى البالطو الطبي، منصتنا تساعدك في الوصول إلى ما تحتاجه بسعر أقل حسب تخصصك ومستواك الدراسي.
+              </p>
+              <div class="flex items-center justify-center gap-4 mt-8">
+                <div class="bg-blue-600 text-white px-6 py-2 rounded-full font-bold">
+                  من الطلاب للطلاب
+                </div>
+                <div class="bg-purple-600 text-white px-6 py-2 rounded-full font-bold">
+                  مجتمع متكامل
+                </div>
+                <div class="bg-green-600 text-white px-6 py-2 rounded-full font-bold">
+                  دعم حقيقي
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="container mx-auto px-4 py-16">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-12">
+        <h2 class="text-4xl font-bold text-gray-800 mb-4">Our Impact</h2>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+          Making a real difference in students' lives
+        </p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="text-center p-8 bg-gradient-to-br from-blue-50 to-white rounded-2xl shadow-lg">
+          <div class="text-5xl font-bold text-blue-600 mb-4">10,000+</div>
+          <h3 class="text-xl font-bold text-gray-800 mb-2">Students Helped</h3>
+          <p class="text-gray-600">
+            Students from different universities and majors have saved money through our platform
+          </p>
+        </div>
+        <div class="text-center p-8 bg-gradient-to-br from-purple-50 to-white rounded-2xl shadow-lg">
+          <div class="text-5xl font-bold text-purple-600 mb-4">50+</div>
+          <h3 class="text-xl font-bold text-gray-800 mb-2">Vendor Partners</h3>
+          <p class="text-gray-600">
+            Local and international vendors providing exclusive student discounts
+          </p>
+        </div>
+        <div class="text-center p-8 bg-gradient-to-br from-green-50 to-white rounded-2xl shadow-lg">
+          <div class="text-5xl font-bold text-green-600 mb-4">$2M+</div>
+          <h3 class="text-xl font-bold text-gray-800 mb-2">Total Savings</h3>
+          <p class="text-gray-600">
+            Money saved by students that can be invested in their education
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="container mx-auto px-4 py-16">
+    <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-12 text-center text-white">
+      <div class="max-w-3xl mx-auto">
+        <h2 class="text-4xl font-bold mb-6">Be Part of the Change</h2>
+        <p class="text-xl mb-10">
+          Join thousands of students who are already saving on their educational expenses
+        </p>
+        <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
+          <button 
+            routerLink="/products"
+            class="bg-white text-blue-600 px-8 py-3 rounded-full font-bold text-lg hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 shadow-2xl flex items-center gap-2">
+            <i class="fas fa-search"></i> Find Discounts Now
+          </button>
+          <button 
+            (click)="scrollToTop()"
+            class="bg-transparent border-2 border-white text-white px-8 py-3 rounded-full font-bold text-lg hover:bg-white/10 transition-all duration-300 flex items-center gap-2">
+            <i class="fas fa-graduation-cap"></i> Learn More
+          </button>
+        </div>
+        <div class="mt-10 pt-8 border-t border-white/30">
+          <p class="text-lg opacity-90">
+            <i class="fas fa-heart mr-2"></i>
+            Remember: When you save, you're supporting fellow students
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div class="container mx-auto px-4 pb-12">
+    <div class="text-center">
+      <p class="text-gray-600 italic">
+        "Together, we're building a community where no student has to choose between buying textbooks and paying bills."
+      </p>
+      <p class="text-sm text-gray-500 mt-4">
+        StudentDiscount © 2025 - Created by Students, for Students
+      </p>
+    </div>
+  </div>
+</div>

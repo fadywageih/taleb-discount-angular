@@ -13,8 +13,6 @@ export class ValidationService {
 
   checkEmailExists(email: string): Observable<boolean> {
     console.log('🔍 ValidationService: Checking email:', email);
-    
-    // استخدام HttpParams للـ query parameters الآمنة
     const params = new HttpParams().set('email', email);
     
     return this.http.get<boolean>(`${this.apiUrl}/emailexists`, { params })
@@ -22,7 +20,6 @@ export class ValidationService {
         tap(result => console.log('✅ ValidationService: Email check result:', result)),
         catchError(error => {
           console.error('❌ ValidationService: Email check error:', error);
-          // إرجاع false في حالة الخطأ (افتراض أن الإيميل غير مستخدم)
           return [false];
         })
       );

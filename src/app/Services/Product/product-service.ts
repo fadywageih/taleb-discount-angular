@@ -1,7 +1,7 @@
 // src/app/Services/Product/product-service.ts
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { HttpClient, HttpHeaders, HttpErrorResponse, HttpParams } from '@angular/common/http';
+import { Observable, throwError, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { AccountService } from '../account/account-service';
@@ -25,15 +25,12 @@ export class ProductService {
   constructor() {
     console.log('🔗 Product Service API URL:', this.baseUrl);
   }
-
-  // إنشاء headers مع الـ token
   private getAuthHeaders(): HttpHeaders {
     const token = this.accountService.getToken();
     console.log('🔐 Product Service Token:', token ? 'Exists' : 'Missing');
     
     return new HttpHeaders({
       'Authorization': `Bearer ${token}`
-      // لا تضيف Content-Type هنا علشان FormData يضيفها تلقائياً
     });
   }
 
@@ -75,20 +72,14 @@ updateProduct(id: number, productData: FormData): Observable<void> {
 
   getAllCategories(): Observable<CategoryResultDto[]> {
     console.log('🔄 Fetching categories...');
-    return this.http.get<CategoryResultDto[]>(`${environment.apiUrl}categories`, { 
-      headers: this.getAuthHeaders() 
-    }).pipe(
-      catchError(this.handleError.bind(this))
-    );
+    // Return empty array as categories come from HomePageData
+    return of([]);
   }
 
   getAllBrands(): Observable<BrandResultDto[]> {
     console.log('🔄 Fetching brands...');
-    return this.http.get<BrandResultDto[]>(`${environment.apiUrl}brands`, { 
-      headers: this.getAuthHeaders() 
-    }).pipe(
-      catchError(this.handleError.bind(this))
-    );
+    // Return empty array as brands come from HomePageData
+    return of([]);
   }
 
   getVendorProducts(): Observable<ProductResultDto[]> {
@@ -99,8 +90,6 @@ updateProduct(id: number, productData: FormData): Observable<void> {
       catchError(this.handleError.bind(this))
     );
   }
-
-  // دالة للحصول على المنتجات مع pagination إذا محتاج
   getProductsPaginated(params?: any): Observable<PaginatedResult<ProductResultDto>> {
     console.log('🔄 Fetching paginated products...');
     return this.http.get<PaginatedResult<ProductResultDto>>(this.baseUrl, { 
@@ -138,5 +127,53 @@ updateProduct(id: number, productData: FormData): Observable<void> {
     
     return throwError(() => new Error(errorMessage));
   }
+  getAllProductsForStudents(params?: any): Observable<PaginatedResult<ProductResultDto>> {
+  console.log('🎓 Fetching all products for students...');
+  
+  let httpParams = new HttpParams();
+  
+  if (params) {
+    Object.keys(params).forEach(key => {
+      const value = (params as any)[key];
+      if (value !== undefined && value !== null && value !== '') {
+        httpParams = httpParams.set(key, value.toString());
+      }
+    });
+  }
+
+  return this.http.get<PaginatedResult<ProductResultDto>>(this.baseUrl, { 
+    headers: this.getAuthHeaders(),
+    params: httpParams
+  }).pipe(
+    catchError(this.handleError.bind(this))
+  );
+}
+  getBestSellingProducts(): Observable<ProductResultDto[]> {
+    console.log('🔄 Fetching best selling products...');
+    return this.http.get<ProductResultDto[]>(`${this.baseUrl}/best-selling`, { 
+      headers: this.getAuthHeaders()
+    }).pipe(
+      catchError(this.handleError.bind(this))
+    );
+  }
+  getProductsByCategory(categoryId: number): Observable<ProductResultDto[]> {
+    console.log('🔄 Fetching products by category:', categoryId);
+    return this.http.get<ProductResultDto[]>(`${this.baseUrl}/category/${categoryId}`, { 
+      headers: this.getAuthHeaders()
+    }).pipe(
+      catchError(this.handleError.bind(this))
+    );
+  }
+  searchProducts(searchTerm: string): Observable<ProductResultDto[]> {
+    console.log('🔍 Searching products:', searchTerm);
+    const params = new HttpParams().set('searchTerm', searchTerm);
+    return this.http.get<ProductResultDto[]>(`${this.baseUrl}/search`, { 
+      headers: this.getAuthHeaders(),
+      params
+    }).pipe(
+      catchError(this.handleError.bind(this))
+    );
+  }
+
 }
 

@@ -235,8 +235,7 @@ export class VendorHome implements OnInit, OnDestroy {
     const term = this.searchTerm.toLowerCase();
     return this.products.filter(product =>
       product.name.toLowerCase().includes(term) ||
-      product.categoryName.toLowerCase().includes(term)
-    );
+      product.categoryName && product.categoryName.toLowerCase().includes(term))
   }
 
   handleImageError(event: any, index: number) {

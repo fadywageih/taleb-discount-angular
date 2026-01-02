@@ -4,7 +4,6 @@ import { AccountService } from '../../../Services/account/account-service';
 import { ValidationService } from '../../../Services/validation/validation.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-
 @Component({
   selector: 'app-register-vendor',
   templateUrl: './register-vendor.html',

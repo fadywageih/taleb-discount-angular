@@ -14,12 +14,16 @@ import { VendorEdit } from './Components/vendor/vendor-edit/vendor-edit';
 import { vendorGuard } from './guards/vendor.guard';
 import { CreateProduct } from './Components/Product/create-product/create-product';
 import { EditProduct } from './Components/Product/edit-product/edit-product';
+import { ViewProduct } from './Components/Product/view-product/view-product';
+import { About } from './Components/about/about';
 
 export const routes: Routes = [
   { path: '', component: Cover },
   { path: 'home', component: Home, canActivate: [authGuard] },
+  { path: 'products', component: ViewProduct, canActivate: [authGuard] },
   { path: 'cover', component: Cover },
   { path: 'login', component: Login },
+    { path: 'about', component: About },
   { path: 'register/school', component: RegisterSchool },
   { path: 'register/vendor', component: RegisterVendor },
   { path: 'register/university', component: RegisterUniversity },

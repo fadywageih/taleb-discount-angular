@@ -1,79 +1,201 @@
-// src/app/home/home.component.ts
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { AccountService } from '../Services/account/account-service';
-import { UserResultDto } from '../core/types/auth.types'; 
-
+import { HomePageData } from '../core/types/User/HomePageData';
+import { ProductResultDto } from '../core';
+import { Header } from '../shared/header/header';
+import { HomeService } from '../Services/home/home-service';
 @Component({
   selector: 'app-home',
-  imports: [CommonModule],
-  template: `
-    <div class="min-h-screen bg-gray-100 p-8">
-      <div class="max-w-4xl mx-auto">
-        <!-- Header -->
-        <header class="bg-white shadow-sm rounded-lg p-6 mb-8">
-          <div class="flex justify-between items-center">
-            <h1 class="text-3xl font-bold text-gray-800">مرحباً بك في النظام</h1>
-            <div class="flex items-center space-x-4">
-              <span class="text-gray-700">أهلاً، {{ currentUser?.displayName }}</span>
-              <button 
-                (click)="logout()"
-                class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
-                تسجيل الخروج
-              </button>
-            </div>
-          </div>
-        </header>
-
-        <!-- Main Content -->
-        <main class="bg-white shadow-sm rounded-lg p-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Card 1 -->
-            <div class="bg-blue-50 p-6 rounded-lg border border-blue-200">
-              <h3 class="text-xl font-semibold text-blue-800 mb-3">المعلومات الشخصية</h3>
-              <p class="text-blue-600"><strong>البريد الإلكتروني:</strong> {{ currentUser?.email }}</p>
-              <p class="text-blue-600"><strong>الاسم:</strong> {{ currentUser?.displayName }}</p>
-            </div>
-
-            <!-- Card 2 -->
-            <div class="bg-green-50 p-6 rounded-lg border border-green-200">
-              <h3 class="text-xl font-semibold text-green-800 mb-3">الإحصائيات</h3>
-              <p class="text-green-600">عدد الأنشطة: 15</p>
-              <p class="text-green-600">المهام المكتملة: 8</p>
-            </div>
-
-            <!-- Card 3 -->
-            <div class="bg-purple-50 p-6 rounded-lg border border-purple-200">
-              <h3 class="text-xl font-semibold text-purple-800 mb-3">الإعدادات</h3>
-              <p class="text-purple-600">تعديل الملف الشخصي</p>
-              <p class="text-purple-600">تغيير كلمة المرور</p>
-            </div>
-          </div>
-        </main>
-      </div>
-    </div>
-  `,
+  standalone: true,
+  imports: [
+    CommonModule, 
+    RouterModule, 
+    FormsModule, 
+    Header
+  ],
+  templateUrl: './home.html',
   styleUrls: ['./home.css']
 })
-export class Home implements OnInit {
-  currentUser: UserResultDto | null = null;
+export class Home implements OnInit, OnDestroy {
+  private homeService = inject(HomeService);
+  private accountService = inject(AccountService);
+  private router = inject(Router);
+  
+  homeData: HomePageData = {
+    featuredProducts: [],
+    categories: [],
+    featuredVendors: [],
+    advertisements: []  
+  };
+  
+  randomProducts: ProductResultDto[] = [];
+  bestProducts: ProductResultDto[] = [];
+  
+  loading = true;
+  error = '';
+  
+  @ViewChild('scrollContainer') scrollContainer!: ElementRef<HTMLDivElement>;
 
-  constructor(
-    private accountService: AccountService,
-    private router: Router
-  ) {}
-
-  ngOnInit() {
-    this.currentUser = this.accountService.getCurrentUser();
-    
-    // إذا لم يكن المستخدم مسجل الدخول، إعادة توجيه إلى صفحة Login
-    if (!this.currentUser) {
-      this.router.navigate(['/login']);
-    }
+  ngOnInit(): void {
+    this.loadHomePageData();
   }
 
-  logout() {
-    this.accountService.logout();
+  ngOnDestroy(): void {
+    // تنظيف
+  }
+
+  loadHomePageData(): void {
+    this.loading = true;
+    this.error = '';
+
+    setTimeout(() => {
+      const user = this.accountService.getCurrentUser();
+      const homeData$ = user?.userType === 'School' || user?.userType === 'University'
+        ? this.homeService.getStudentHomePageData()
+        : this.homeService.getHomePageData();
+
+      homeData$.subscribe({
+        next: (data) => {
+          console.log('✅ Home data loaded:', data);
+          this.homeData = data;
+          this.randomProducts = data.featuredProducts.slice(0, 7);
+          this.bestProducts = this.getBestProducts(data.featuredProducts, 3);
+          this.loading = false;
+        },
+        error: (err) => {
+          console.error('❌ Error loading home data:', err);
+          this.error = 'Failed to load home page data';
+          this.loading = false;
+        }
+      });
+    }, 100);
+  }
+  scrollLeft(): void {
+    if (this.scrollContainer?.nativeElement) {
+      const container = this.scrollContainer.nativeElement;
+      const scrollAmount = 400;
+      
+      container.scrollBy({
+        left: -scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  }
+  scrollRight(): void {
+    if (this.scrollContainer?.nativeElement) {
+      const container = this.scrollContainer.nativeElement;
+      const scrollAmount = 400;
+      
+      container.scrollBy({
+        left: scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  }
+  getBestProducts(products: ProductResultDto[], count: number): ProductResultDto[] {
+    return [...products]
+      .filter(p => p.discountPrice)
+      .sort((a, b) => {
+        const discountA = this.calculateDiscountPercentage(a);
+        const discountB = this.calculateDiscountPercentage(b);
+        return discountB - discountA;
+      })
+      .slice(0, count);
+  }
+
+  onCategorySelect(categoryId: number): void {
+    this.router.navigate(['/products'], { queryParams: { category: categoryId } });
+  }
+
+  calculateDiscountPercentage(product: ProductResultDto): number {
+    if (!product.discountPrice || product.discountPrice >= product.price) return 0;
+    return Math.round(((product.price - product.discountPrice) / product.price) * 100);
+  }
+
+  // إضافة دالة لعرض السعر مع الخصم
+  getDisplayPrice(product: ProductResultDto): string {
+    if (product.discountPrice && product.discountPrice < product.price) {
+      return `$${product.discountPrice.toFixed(2)}`;
+    }
+    return `$${product.price.toFixed(2)}`;
+  }
+  getOriginalPrice(product: ProductResultDto): string {
+    if (product.discountPrice && product.discountPrice < product.price) {
+      return `$${product.price.toFixed(2)}`;
+    }
+    return '';
+  }
+
+getStockPercentage(product: ProductResultDto): number {
+  const quantity = product.quantity || 0;
+  
+  if (quantity === 0) return 0;
+  if (quantity <= 5) return 20;
+  if (quantity <= 10) return 40;
+  if (quantity <= 20) return 60;
+  if (quantity <= 50) return 80;
+  return 100;
+}
+
+  getProductImage(product: ProductResultDto): string {
+    return product.pictureUrl || 'assets/Images/default-product.jpg';
+  }
+
+  getCategoryImage(categoryName: string): string {
+    const categoryImageMap: {[key: string]: string} = {
+      'Supplies': 'Category-1.jpg',
+      'Technology': 'category-2.jpeg',
+      'Medical': 'category-3.jpg',
+      'Engineering': 'category-4.png',
+      'Workspaces': 'Category-11.avif',
+      'Uniform': 'Category-1.jpg'  
+    };
+    
+    const fileName = categoryImageMap[categoryName];
+    
+    if (fileName) {
+      return `assets/Images/categories/${fileName}`;
+    }
+    
+    return 'assets/Images/default-category.jpg';
+  }
+
+  onImageError(event: Event): void {
+    const imgElement = event.target as HTMLImageElement;
+    imgElement.src = 'assets/Images/default-category.jpg';
+  }
+
+  get userType(): string {
+    return this.accountService.getCurrentUser()?.userType || '';
+  }
+
+  get isStudent(): boolean {
+    const userType = this.userType;
+    return userType === 'School' || userType === 'University';
+  }
+
+  goToAllProducts(): void {
+    this.router.navigate(['/products']);
+  }
+
+  get splitLetters(): any[] {
+    const text = "One Click, Countless Student Savings!";
+    const letters = [];
+    
+    for(let i = 0; i < text.length; i++) {
+      const popDelay = (i * 0.1) + 's';
+      const gradientDelay = '0.1s';
+      
+      letters.push({
+        char: text[i],
+        delays: `${popDelay}, ${gradientDelay}`,
+        isSpace: text[i] === ' '
+      });
+    }
+    
+    return letters;
   }
 }

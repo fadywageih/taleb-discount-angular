@@ -1,34 +1,74 @@
-<header class="header-bg w-full h-[85px] flex justify-center items-center sticky top-0 z-50 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 shadow-lg">
+<!-- src/app/Components/header/header.html -->
+<header
+  class="header-bg w-full h-[85px] flex justify-center items-center sticky top-0 z-50 bg-gradient-to-br from-blue-900 via-indigo-900 to-blue-900 shadow-lg">
   <div class="flex justify-between items-center w-[95%] max-w-[1180px] h-full">
 
     <!-- Logo -->
     <div class="flex items-center">
       <img [src]="'assets/Images/Logo.jpg'"
-        class="logo w-[180px] h-[68px] rounded-full object-cover border-2 border-gray-600 shadow-md transition-transform duration-300 hover:scale-105">
+        class="logo w-[180px] h-[68px] rounded-full object-cover border-2 border-gray-300 shadow-md transition-transform duration-300 hover:scale-105">
     </div>
 
     <!-- Desktop Navigation -->
     <nav class="hidden md:flex items-center space-x-8">
       <div class="relative">
-        <div class="line h-1 w-[75px] bg-gray-900 absolute -top-7 -left-3 rounded-full"></div>
-        <a href="/home"
-          class="nav-text text-lg text-gray-100 hover:text-blue-400 transition duration-700 capitalize font-medium relative group">
+        <div class="line h-1 w-[75px] bg-blue-300 absolute -top-7 -left-3 rounded-full"></div>
+        <a routerLink="/home"
+          class="nav-text text-lg text-white hover:text-blue-300 transition duration-700 capitalize font-medium relative group">
           Home
           <span
-            class="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-full"></span>
+            class="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-300 transition-all duration-300 group-hover:w-full"></span>
         </a>
       </div>
-      <a [routerLink]="['/login']"
-        class="nav-text text-lg text-gray-100 hover:text-blue-400 transition duration-700 capitalize font-medium relative group">
-        Login
-        <span
-          class="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-full"></span>
-      </a>
+
+      <div class="relative">
+        <a routerLink="/products"
+          class="nav-text text-lg text-white hover:text-blue-300 transition duration-700 capitalize font-medium relative group">
+          Products
+          <span
+            class="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-300 transition-all duration-300 group-hover:w-full"></span>
+        </a>
+      </div>
+      <div class="relative">
+  <a routerLink="/about"
+    class="nav-text text-lg text-white hover:text-blue-300 transition duration-700 capitalize font-medium relative group">
+    About
+    <span
+      class="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-300 transition-all duration-300 group-hover:w-full"></span>
+  </a>
+</div>
+      <!-- User Menu -->
+      <div class="relative group">
+        <button class="flex items-center space-x-2 text-white hover:text-blue-300 transition duration-300">
+          <i class="fas fa-user-circle text-xl"></i>
+          <span class="capitalize">{{ currentUser?.displayName || 'Student' }}</span>
+          <i class="fas fa-chevron-down text-xs"></i>
+        </button>
+
+        <!-- Dropdown Menu -->  
+        <div
+          class="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+          <div class="py-2">
+            <a class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition duration-300">
+              <i class="fas fa-user mr-2"></i>Profile
+            </a>
+            <a class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition duration-300">
+              <i class="fas fa-cog mr-2"></i>Settings
+            </a>
+            <div class="border-t my-1"></div>
+            <a (click)="logout()"
+              class="block px-4 py-2 text-red-600 hover:bg-red-50 cursor-pointer transition duration-300">
+              <i class="fas fa-sign-out-alt mr-2"></i>Logout
+            </a>
+
+          </div>
+        </div>
+      </div>
     </nav>
 
     <!-- Mobile Menu Button -->
     <button
-      class="hamburger md:hidden text-xl text-gray-900 z-[100000] p-2 rounded-lg hover:bg-gray-700 transition duration-300"
+      class="hamburger md:hidden text-xl text-white z-[100000] p-2 rounded-lg hover:bg-blue-800 transition duration-300"
       (click)="toggleMobileMenu()">
       <i class="fas fa-bars"></i>
     </button>
@@ -36,23 +76,31 @@
 
   <!-- Mobile Menu -->
   <div [class.hidden]="!isMobileMenuOpen"
-    class="mobile-menu md:hidden w-full absolute top-[80px] left-0 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 shadow-xl transition-all duration-300 overflow-hidden"
+    class="mobile-menu md:hidden w-full absolute top-[80px] left-0 bg-gradient-to-br from-blue-900 via-indigo-900 to-blue-900 shadow-xl transition-all duration-300 overflow-hidden"
     [style.max-height]="isMobileMenuOpen ? '500px' : '0'">
     <div class="container mx-auto px-4 py-6 flex flex-col space-y-3">
-      <a href="/home"
-        class="nav-text text-lg text-gray-100 hover:text-blue-400 transition duration-300 py-3 px-2 border-b border-gray-600 last:border-b-0 group">
+      <a routerLink="/home"
+        class="nav-text text-lg text-white hover:text-blue-300 transition duration-300 py-3 px-2 border-b border-blue-700 last:border-b-0 group">
         <span class="block relative">Home
           <span
-            class="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-full"></span>
+            class="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-300 transition-all duration-300 group-hover:w-full"></span>
         </span>
       </a>
 
-      <a [routerLink]="['/login']"
-        class="nav-text text-lg text-gray-100 hover:text-blue-400 transition duration-700 capitalize font-medium relative group">
-         Login
+
+      <a routerLink="/products"
+        class="nav-text text-lg text-white hover:text-blue-300 transition duration-700 capitalize font-medium relative group">
+        Products
         <span
-          class="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-full"></span>
+          class="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-300 transition-all duration-300 group-hover:w-full"></span>
       </a>
+
+      <div class="pt-4 border-t border-blue-700">
+        <a (click)="logout()"
+          class="block text-lg text-red-300 hover:text-red-200 py-2 cursor-pointer transition duration-300">
+          <i class="fas fa-sign-out-alt mr-2"></i>Logout
+        </a>
+      </div>
     </div>
   </div>
 </header>
