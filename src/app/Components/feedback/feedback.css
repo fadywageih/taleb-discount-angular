@@ -1,0 +1,84 @@
+/* Animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out;
+}
+
+/* Star hover effects */
+.fa-star {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Form transitions */
+input, textarea, select {
+  transition: all 0.3s ease;
+}
+
+/* Category card hover */
+label:hover .fa-store,
+label:hover .fa-box,
+label:hover .fa-globe {
+  transform: scale(1.1);
+  transition: transform 0.3s ease;
+}
+
+/* Rating stars pulse effect */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.fa-star:hover {
+  animation: pulse 0.5s ease-in-out;
+}
+
+/* Success checkmark animation */
+@keyframes checkmark {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.fa-check-circle {
+  animation: checkmark 0.5s ease-out;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .grid-cols-3 {
+    grid-template-columns: 1fr;
+  }
+  
+  .text-4xl {
+    font-size: 2.5rem;
+  }
+}
+
+/* Loading spinner */
+.fa-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

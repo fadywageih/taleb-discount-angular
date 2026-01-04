@@ -16,11 +16,13 @@ import { CreateProduct } from './Components/Product/create-product/create-produc
 import { EditProduct } from './Components/Product/edit-product/edit-product';
 import { ViewProduct } from './Components/Product/view-product/view-product';
 import { About } from './Components/about/about';
-
+import { ProductDetails } from './Components/Product/product-details/product-details';
+import { Feedback } from './Components/feedback/feedback';
 export const routes: Routes = [
   { path: '', component: Cover },
   { path: 'home', component: Home, canActivate: [authGuard] },
   { path: 'products', component: ViewProduct, canActivate: [authGuard] },
+    { path: 'products/:id', component: ProductDetails, canActivate: [authGuard] },
   { path: 'cover', component: Cover },
   { path: 'login', component: Login },
     { path: 'about', component: About },
@@ -29,7 +31,7 @@ export const routes: Routes = [
   { path: 'register/university', component: RegisterUniversity },
   { path: 'forgot-password', component: ForgotPassword },
   { path: 'reset-password', component: ResetPassword },
-  
+   { path: 'feedback', component: Feedback },
   // Vendor Routes مع VendorGuard
   { path: 'vendor/home', component: VendorHome, canActivate: [vendorGuard] },
   { path: 'vendor/edit', component: VendorEdit, canActivate: [vendorGuard] },

@@ -1,12 +1,9 @@
 <app-header></app-header>
 
 <div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-  
-  <!-- Hero Section -->
   <section class="relative py-12">
     <div class="container mx-auto px-4">
       <div class="text-center mb-8">
-        <!-- العنوان مع Split Letters + Gradient -->
         <div class="split-letters-container mb-4">
           <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold">
             <span *ngFor="let letter of splitLetters; let i = index"
@@ -16,14 +13,10 @@
             </span>
           </h1>
         </div>
-        
-        <!-- الوصف يظهر بعد انتهاء أنيميشن العنوان -->
         <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto animate-fade-in">
           Discover amazing discounts and offers tailored just for students like you
         </p>
       </div>
-        
-      <!-- Hero Image -->
       <div class="max-w-4xl mx-auto mt-12">
         <div class="rounded-2xl overflow-hidden shadow-2xl">
           <img 
@@ -34,8 +27,6 @@
       </div>
     </div>
   </section>
-
-  <!-- Products Categories -->
   <section class="container mx-auto px-4 py-16">
     <h2 class="text-4xl font-bold text-gray-800 mb-12 text-center">Products Categories</h2>
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 max-w-6xl mx-auto">
@@ -59,8 +50,6 @@
     <div class="inline-block animate-spin rounded-full h-20 w-20 border-4 border-blue-600 border-t-transparent"></div>
     <p class="text-xl mt-6 text-gray-600">Loading amazing deals for you...</p>
   </div>
-
-  <!-- Error State -->
   <div *ngIf="error && !loading" class="container mx-auto px-4 py-20 text-center">
     <div class="bg-red-50 border border-red-200 rounded-2xl p-8 max-w-2xl mx-auto">
       <span class="text-6xl mb-4 block">😔</span>
@@ -73,11 +62,7 @@
       </button>
     </div>
   </div>
-
-  <!-- Main Content -->
   <div *ngIf="!loading && !error" class="container mx-auto px-4 py-16">
-    
-    <!-- Welcome Banner -->
     <div *ngIf="isStudent" class="text-center mb-16">
       <div class="inline-block bg-gradient-to-r from-blue-100 to-purple-100 rounded-2xl p-1 mb-6">
         <div class="bg-white rounded-xl px-8 py-4">
@@ -120,8 +105,6 @@
         </div>
       </div>
     </section>
-
-    <!-- Static Content Section -->
     <section class="mb-20">
       <div class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-3xl overflow-hidden shadow-2xl">
         <div class="flex flex-col lg:flex-row">
@@ -224,15 +207,11 @@
       <div *ngFor="let product of randomProducts" 
            class="featured-product-card group shrink-0">
         <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 h-full w-80 flex flex-col mx-auto">
-          
-          <!-- Product Image with Overlay -->
           <div class="relative h-52 overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
             <img 
               [src]="getProductImage(product)" 
               [alt]="product.name"
               class="w-full h-full object-contain p-4 group-hover:scale-110 transition-transform duration-500">
-            
-            <!-- Top Badges -->
             <div class="absolute top-3 left-3 flex  flex-col gap-1">
               <!-- Discount Badge -->
               <div *ngIf="product.discountPrice && product.discountPrice < product.price" 
@@ -255,23 +234,15 @@
               </div>
             </div>
           </div>
-          
-          <!-- Product Info -->
           <div class="p-5 flex-1 flex flex-col">
-            
-            <!-- Category Badge - في الأعلى -->
             <div class="mb-3">
               <div class="inline-block bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-xs font-semibold border border-blue-100">
                 {{ product.categoryName || 'Uncategorized' }}
               </div>
             </div>
-            
-            <!-- Product Name -->
             <h3 class="font-bold text-lg text-gray-800 line-clamp-2 mb-2 flex-1">
               {{ product.name }}
             </h3>
-            
-            <!-- Vendor Name - مع أيقونة أجمل -->
             <div class="flex items-center gap-2 mb-4">
               <div class="flex items-center gap-2 text-gray-600">
                 <div class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 flex items-center justify-center">
@@ -284,8 +255,6 @@
                 </span>
               </div>
             </div>
-            
-            <!-- Price Section - تصميم جديد -->
             <div class="mt-auto pt-4 border-t border-gray-100">
               <div class="flex items-end justify-between mb-1">
                 <!-- Current Price -->
@@ -295,29 +264,21 @@
                     <span class="text-2xl font-bold text-gray-800">
                       {{ getDisplayPrice(product) }}
                     </span>
-                    
-                    <!-- Original Price (if discount) -->
                     <span *ngIf="getOriginalPrice(product)" 
                           class="text-sm text-gray-400 line-through">
                       {{ getOriginalPrice(product) }}
                     </span>
                   </div>
                 </div>
-                
-                <!-- Per Unit Badge -->
                 <div class="text-xs bg-gray-50 text-gray-600 px-2 py-1 rounded">
                   Per unit
                 </div>
               </div>
-              
-              <!-- Quantity Info - تصميم أكثر نظافة -->
               <div class="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
                 <div class="text-sm text-gray-600">
                   <span class="font-medium">Available:</span>
                   <span class="ml-1 font-bold text-gray-800">{{ product.quantity || 0 }} units</span>
                 </div>
-                
-                <!-- Stock Percentage -->
                 <div class="text-sm font-medium"
                      [ngClass]="{
                        'text-green-600': product.quantity > 10,
@@ -327,8 +288,6 @@
                   {{ getStockPercentage(product) }}%
                 </div>
               </div>
-              
-              <!-- Progress Bar - أرق -->
               <div class="mt-2">
                 <div class="h-1 bg-gray-200 rounded-full overflow-hidden">
                   <div class="h-full rounded-full transition-all duration-500"

@@ -1,0 +1,298 @@
+<app-header></app-header>
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+  <nav class="container mx-auto px-4 py-4">
+    <ol class="flex items-center space-x-2 text-sm">
+      <li>
+        <a [routerLink]="['/']" class="text-blue-600 hover:text-blue-800 transition-colors">
+          <i class="fas fa-home mr-1"></i>
+          Home
+        </a>
+      </li>
+      <li><i class="fas fa-chevron-right text-gray-400"></i></li>
+      <li>
+        <a [routerLink]="['/products']" class="text-blue-600 hover:text-blue-800 transition-colors">
+          Products
+        </a>
+      </li>
+      <li><i class="fas fa-chevron-right text-gray-400"></i></li>
+      <li class="text-gray-600 truncate">{{ product?.name || 'Product Details' }}</li>
+    </ol>
+  </nav>
+  <div *ngIf="loading" class="container mx-auto px-4 py-20 text-center">
+    <div class="inline-block animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mb-4"></div>
+    <p class="text-xl text-gray-600">Loading product details...</p>
+  </div>
+  <div *ngIf="error && !loading" class="container mx-auto px-4 py-20">
+    <div class="bg-red-50 border border-red-200 rounded-2xl p-8 text-center max-w-2xl mx-auto">
+      <span class="text-6xl mb-4 block">😔</span>
+      <h3 class="text-2xl font-bold text-red-800 mb-2">Product Not Found</h3>
+      <p class="text-red-600 mb-6">{{ error }}</p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <button 
+          (click)="goBack()"
+          class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+        >
+          <i class="fas fa-arrow-left mr-2"></i>
+          Back to Products
+        </button>
+        <button 
+          (click)="loadProductDetails(product?.id?.toString() || '')"
+          class="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg hover:bg-gray-300 transition-colors font-semibold"
+        >
+          <i class="fas fa-redo mr-2"></i>
+          Try Again
+        </button>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="!loading && !error && product" class="container mx-auto px-4 py-8">
+    <button 
+      (click)="goBack()"
+      class="mb-6 flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+    >
+      <i class="fas fa-arrow-left mr-2"></i>
+      Back to Products
+    </button>
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
+        <div>
+          <div class="rounded-xl overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
+            <img 
+              [src]="getMainProductImage()" 
+              [alt]="product.name"
+              class="w-full h-96 object-contain p-4 hover:scale-105 transition-transform duration-500 cursor-zoom-in"
+              (error)="onImageError($event)"
+              (click)="openImageZoom()"
+            />
+          </div>
+
+          <!-- Image Zoom Modal (Optional) -->
+          <div *ngIf="showImageZoom" class="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4" 
+               (click)="closeImageZoom()">
+            <div class="max-w-4xl max-h-4xl">
+              <img 
+                [src]="getMainProductImage()" 
+                [alt]="product.name"
+                class="w-full h-full object-contain"
+              />
+              <button 
+                class="absolute top-4 right-4 text-white text-3xl hover:text-gray-300"
+                (click)="closeImageZoom()"
+              >
+                &times;
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product Info -->
+        <div class="flex flex-col">
+          <!-- Category & Stock -->
+          <div class="flex items-center justify-between mb-4">
+            <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-sm font-semibold">
+              {{ product.categoryName || 'Uncategorized' }}
+            </span>
+            <span [class]="'px-3 py-1 rounded-full text-sm font-bold ' + getStockColor()">
+              {{ getStockStatus() }}
+            </span>
+          </div>
+
+          <!-- Product Name -->
+          <h1 class="text-3xl font-bold text-gray-800 mb-4">{{ product.name }}</h1>
+
+          <!-- Vendor Info -->
+          <div class="flex items-center gap-3 mb-6 p-3 bg-gray-50 rounded-lg">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 flex items-center justify-center">
+              <i class="fas fa-store text-blue-600"></i>
+            </div>
+            <div>
+              <p class="font-semibold text-gray-800">{{ product.vendorName || 'Vendor' }}</p>
+              <p class="text-sm text-gray-600">Verified Seller</p>
+            </div>
+          </div>
+
+          <!-- Rating -->
+          <div class="flex items-center gap-2 mb-6">
+            <div class="flex text-yellow-400">
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star-half-alt"></i>
+            </div>
+            <span class="text-gray-600">(4.5) • {{ product.orders || 128 }} Reviews</span>
+          </div>
+
+          <!-- Price Section -->
+          <div class="mb-6">
+            <!-- Discount Badge -->
+            <div *ngIf="calculateDiscountPercentage() > 0" class="mb-2">
+              <span class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-sm font-bold">
+                -{{ calculateDiscountPercentage() }}% OFF
+              </span>
+            </div>
+
+            <!-- Show discountPercentage if available -->
+            <div *ngIf="product.discountPercentage && product.discountPercentage > 0" class="mb-2">
+              <span class="bg-green-100 text-green-600 px-3 py-1 rounded-full text-sm font-bold">
+                Save {{ product.discountPercentage }}%
+              </span>
+            </div>
+
+            <div class="flex items-baseline gap-3">
+              <span class="text-4xl font-bold text-gray-800">
+                {{ getDisplayPrice() }}
+              </span>
+              <span *ngIf="getOriginalPrice()" class="text-xl text-gray-400 line-through">
+                {{ getOriginalPrice() }}
+              </span>
+              <!-- Show originalPrice if available -->
+              <span *ngIf="product.originalPrice && product.originalPrice > (product.discountPrice || product.price)" 
+                    class="text-xl text-gray-400 line-through">
+                ${{ product.originalPrice.toFixed(2) }}
+              </span>
+            </div>
+
+            <!-- Student Discount -->
+            <div *ngIf="isStudent && getStudentDiscount() > 0" class="mt-2 p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-graduation-cap text-blue-600"></i>
+                <span class="font-semibold text-blue-700">Student Exclusive:</span>
+                <span class="text-green-600 font-bold">Save ${{ getStudentDiscount().toFixed(2) }}</span>
+              </div>
+              <p class="text-sm text-gray-600 mt-1">
+                Final price: <span class="font-bold text-green-700">{{ getStudentPrice() }}</span>
+              </p>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="mb-8">
+            <h3 class="text-lg font-bold text-gray-800 mb-3">Description</h3>
+            <div class="text-gray-600 leading-relaxed">
+              <p>{{ product.description || 'No description available for this product.' }}</p>
+              
+              <!-- Additional Details -->
+              <div class="mt-4 space-y-2">
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-box text-gray-400"></i>
+                  <span>Quantity Available: <strong>{{ product.quantity || 0 }} units</strong></span>
+                </div>
+                <div class="flex items-center gap-2" *ngIf="product.address">
+                  <i class="fas fa-map-marker-alt text-gray-400"></i>
+                  <span>Location: <strong>{{ product.address }}</strong></span>
+                </div>
+                <div class="flex items-center gap-2" *ngIf="product.createdAt">
+                  <i class="fas fa-calendar-plus text-gray-400"></i>
+                  <span>Listed: <strong>{{ formatDate(product.createdAt) }}</strong></span>
+                </div>
+                <div class="flex items-center gap-2" *ngIf="product.updatedAt">
+                  <i class="fas fa-sync-alt text-gray-400"></i>
+                  <span>Last Updated: <strong>{{ formatDate(product.updatedAt) }}</strong></span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-tag text-gray-400"></i>
+                  <span>Status: <strong [class]="product.isActive ? 'text-green-600' : 'text-red-600'">
+                    {{ product.isActive ? 'Active' : 'Inactive' }}
+                  </strong></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quantity Selector -->
+          <div class="mb-8">
+            <h3 class="text-lg font-bold text-gray-800 mb-3">Quantity</h3>
+            <div class="flex items-center gap-4">
+              <div class="flex items-center border border-gray-300 rounded-lg">
+                <button 
+                  (click)="decreaseQuantity()"
+                  [disabled]="quantity <= 1"
+                  class="px-4 py-2 text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                >
+                  <i class="fas fa-minus"></i>
+                </button>
+                <span class="px-4 py-2 font-bold text-gray-800 min-w-[60px] text-center">
+                  {{ quantity }}
+                </span>
+                <button 
+                  (click)="increaseQuantity()"
+                  [disabled]="!product || quantity >= product.quantity"
+                  class="px-4 py-2 text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                >
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+              <span class="text-sm text-gray-600">
+                {{ product.quantity || 0 }} available
+              </span>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-col sm:flex-row gap-4 mb-8">
+            <button
+              (click)="addToCart()"
+              [disabled]="product.quantity === 0"
+              [class]="'flex-1 px-8 py-4 rounded-lg font-bold text-lg transition-all duration-300 ' +
+                      (product.quantity === 0 
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
+                        : 'bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:shadow-lg hover:-translate-y-1')"
+            >
+              <i class="fas fa-shopping-cart mr-2"></i>
+              {{ product.quantity === 0 ? 'Out of Stock' : 'Get it now' }}
+            </button>
+          </div>
+
+          <!-- Additional Actions -->
+          <div class="flex items-center gap-4 border-t border-gray-200 pt-6">
+            <button
+              (click)="shareProduct()"
+              class="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors"
+            >
+              <i class="fas fa-share-alt text-xl"></i>
+              <span>Share</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Related Products -->
+    <div *ngIf="relatedProducts.length > 0" class="mt-12">
+      <h2 class="text-2xl font-bold text-gray-800 mb-6">Related Products</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div *ngFor="let relatedProduct of relatedProducts" 
+             class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+          <div class="h-48 overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
+            <img 
+              [src]="relatedProduct.pictureUrl || 'assets/Images/default-product.jpg'" 
+              [alt]="relatedProduct.name"
+              class="w-full h-full object-contain p-4 cursor-pointer"
+              (click)="router.navigate(['/products', relatedProduct.id])"
+            />
+          </div>
+          <div class="p-4">
+            <h3 class="font-bold text-gray-800 line-clamp-1 mb-2">
+              {{ relatedProduct.name }}
+            </h3>
+            <div class="flex items-center justify-between">
+              <span class="text-lg font-bold text-blue-600">
+                ${{ (relatedProduct.discountPrice || relatedProduct.price || 0).toFixed(2) }}
+              </span>
+              <span class="text-sm text-gray-600">
+                {{ relatedProduct.quantity || 0 }} left
+              </span>
+            </div>
+            <button
+              (click)="router.navigate(['/products', relatedProduct.id])"
+              class="w-full mt-3 bg-blue-50 text-blue-600 py-2 rounded-lg font-semibold hover:bg-blue-100 transition-colors"
+            >
+              View Details
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

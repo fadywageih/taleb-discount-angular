@@ -13,7 +13,7 @@ import { HomeService } from '../Services/home/home-service';
   imports: [
     CommonModule, 
     RouterModule, 
-    FormsModule, 
+    FormsModule,
     Header
   ],
   templateUrl: './home.html',

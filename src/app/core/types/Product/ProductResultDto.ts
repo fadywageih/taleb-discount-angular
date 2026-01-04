@@ -6,16 +6,15 @@ export interface ProductResultDto {
   price: number;
   discountPrice?: number;
   quantity: number;
-  categoryId: number; // تأكد من وجود هذا
+  categoryId: number; 
   categoryName?: string;
   pictureUrl?: string;
   address: string;
   isActive: boolean;
   vendorId: string;
   vendorName?: string;
-  createdAt: string; // تأكد من وجود هذا
+  createdAt: string; 
   updatedAt?: string;
-  // إذا كانت هذه الخصائص غير موجودة في الـ API، احذفها
    discountPercentage?: number;
    originalPrice?: number;
    orders?: number;

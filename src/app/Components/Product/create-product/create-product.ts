@@ -1,4 +1,3 @@
-// src/app/Components/Product/create-product/create-product.ts
 import { Component, OnInit, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -6,8 +5,6 @@ import { CommonModule } from '@angular/common';
 import { VendorDto } from '../../../core';
 import { ProductService } from '../../../Services/Product/product-service';
 import { VendorService } from '../../../Services/vendor/vendor.service';
-
-// تعريف الـ Categories الثابتة
 const STATIC_CATEGORIES = [
   { id: 1, name: 'Supplies' },
   { id: 2, name: 'Technology' },
@@ -16,7 +13,6 @@ const STATIC_CATEGORIES = [
   { id: 5, name: 'Workspaces' },
   { id: 6, name: 'Uniform' }
 ];
-
 @Component({
   selector: 'app-create-product',
   templateUrl: './create-product.html',
@@ -32,7 +28,6 @@ export class CreateProduct implements OnInit {
   errorMessage = '';
   successMessage = '';
   vendorData: VendorDto | null = null;
-
   constructor(
     private fb: FormBuilder,
     @Inject(ProductService) private productService: ProductService,
@@ -42,11 +37,9 @@ export class CreateProduct implements OnInit {
   ) {
     this.productForm = this.createForm();
   }
-
   ngOnInit(): void {
     this.loadVendorData();
   }
-
   createForm(): FormGroup {
     return this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
@@ -60,7 +53,6 @@ export class CreateProduct implements OnInit {
       isActive: [true]
     });
   }
-
   loadVendorData(): void {
     this.vendorService.getVendorProfile().subscribe({
       next: (vendor: VendorDto) => {
@@ -72,7 +64,6 @@ export class CreateProduct implements OnInit {
       }
     });
   }
-
   onFileSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
@@ -81,38 +72,29 @@ export class CreateProduct implements OnInit {
         this.errorMessage = 'Please select a valid image file (JPEG, PNG, GIF, WebP)';
         return;
       }
-
       if (file.size > 5 * 1024 * 1024) {
         this.errorMessage = 'Image size should be less than 5MB';
         return;
       }
-
       this.selectedFile = file;
       this.errorMessage = '';
     }
   }
-
   onSubmit(): void {
     if (this.productForm.valid && !this.isSubmitting) {
       this.isSubmitting = true;
       this.errorMessage = '';
       this.successMessage = '';
-
       const formData = new FormData();
-      
-      // إضافة كل الحقول للـ FormData
       Object.keys(this.productForm.value).forEach(key => {
         const value = this.productForm.value[key];
         if (value !== null && value !== undefined && value !== '') {
           formData.append(key, value.toString());
         }
       });
-
-      // إضافة الصورة إذا موجودة
       if (this.selectedFile) {
         formData.append('image', this.selectedFile);
       }
-
       this.productService.createProduct(formData).subscribe({
         next: (product: any) => {
           this.isSubmitting = false;
@@ -132,22 +114,18 @@ export class CreateProduct implements OnInit {
       this.markFormGroupTouched();
     }
   }
-
   private markFormGroupTouched(): void {
     Object.keys(this.productForm.controls).forEach(key => {
       this.productForm.get(key)?.markAsTouched();
     });
   }
-
   onCancel(): void {
     this.router.navigate(['/vendor/home']);
   }
-
   isFieldInvalid(fieldName: string): boolean {
     const field = this.productForm.get(fieldName);
     return !!(field && field.invalid && field.touched);
   }
-
   getFieldError(fieldName: string): string {
     const field = this.productForm.get(fieldName);
     if (field?.errors) {

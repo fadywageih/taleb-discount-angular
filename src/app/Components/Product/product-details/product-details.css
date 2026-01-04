@@ -1,0 +1,36 @@
+.cursor-zoom-in {
+  cursor: zoom-in;
+}
+
+.cursor-zoom-out {
+  cursor: zoom-out;
+}
+img:hover {
+  transform: scale(1.05);
+  transition: transform 0.3s ease;
+}
+.fixed {
+  position: fixed;
+}
+
+.inset-0 {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.z-50 {
+  z-index: 50;
+}
+.bg-opacity-90 {
+  --tw-bg-opacity: 0.9;
+}
+
+.max-w-4xl {
+  max-width: 56rem;
+}
+
+.max-h-4xl {
+  max-height: 56rem;
+}

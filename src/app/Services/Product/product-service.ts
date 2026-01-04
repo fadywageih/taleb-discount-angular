@@ -1,4 +1,3 @@
-// src/app/Services/Product/product-service.ts
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Observable, throwError, of } from 'rxjs';
@@ -13,7 +12,7 @@ import {
   BrandResultDto,
   PaginatedResult 
 } from '../../core';
-
+import { ExtendedProductParameters } from '../../core/types/Product/product-parameters';
 @Injectable({
   providedIn: 'root'
 })
@@ -51,7 +50,6 @@ updateProduct(id: number, productData: FormData): Observable<void> {
     catchError(this.handleError.bind(this))
   );
 }
-
   deleteProduct(id: number): Observable<void> {
     console.log('🔄 Deleting product:', id);
     return this.http.delete<void>(`${this.baseUrl}/${id}`, { 
@@ -60,7 +58,6 @@ updateProduct(id: number, productData: FormData): Observable<void> {
       catchError(this.handleError.bind(this))
     );
   }
-
   getProductById(id: number): Observable<ProductResultDto> {
     console.log('🔄 Fetching product:', id);
     return this.http.get<ProductResultDto>(`${this.baseUrl}/${id}`, { 
@@ -72,16 +69,13 @@ updateProduct(id: number, productData: FormData): Observable<void> {
 
   getAllCategories(): Observable<CategoryResultDto[]> {
     console.log('🔄 Fetching categories...');
-    // Return empty array as categories come from HomePageData
     return of([]);
   }
 
   getAllBrands(): Observable<BrandResultDto[]> {
     console.log('🔄 Fetching brands...');
-    // Return empty array as brands come from HomePageData
     return of([]);
   }
-
   getVendorProducts(): Observable<ProductResultDto[]> {
     console.log('🔄 Fetching vendor products...');
     return this.http.get<ProductResultDto[]>(`${this.baseUrl}/vendor`, { 
@@ -99,7 +93,6 @@ updateProduct(id: number, productData: FormData): Observable<void> {
       catchError(this.handleError.bind(this))
     );
   }
-
   private handleError(error: HttpErrorResponse) {
     console.error('❌ Product Service Error Details:', {
       status: error.status,
@@ -127,11 +120,9 @@ updateProduct(id: number, productData: FormData): Observable<void> {
     
     return throwError(() => new Error(errorMessage));
   }
-  getAllProductsForStudents(params?: any): Observable<PaginatedResult<ProductResultDto>> {
-  console.log('🎓 Fetching all products for students...');
-  
+getAllProducts(params?: ExtendedProductParameters): Observable<PaginatedResult<ProductResultDto>> {
+  console.log('🔄 Fetching all products with params:', params);
   let httpParams = new HttpParams();
-  
   if (params) {
     Object.keys(params).forEach(key => {
       const value = (params as any)[key];
@@ -140,13 +131,16 @@ updateProduct(id: number, productData: FormData): Observable<void> {
       }
     });
   }
-
   return this.http.get<PaginatedResult<ProductResultDto>>(this.baseUrl, { 
     headers: this.getAuthHeaders(),
     params: httpParams
   }).pipe(
     catchError(this.handleError.bind(this))
   );
+}
+getAllProductsForStudents(params?: ExtendedProductParameters): Observable<PaginatedResult<ProductResultDto>> {
+  console.log('🎓 Fetching all products for students...');
+  return this.getAllProducts(params);
 }
   getBestSellingProducts(): Observable<ProductResultDto[]> {
     console.log('🔄 Fetching best selling products...');

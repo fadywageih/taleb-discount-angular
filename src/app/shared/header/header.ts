@@ -29,6 +29,6 @@ export class Header {
 
   logout(): void {
     this.accountService.logout();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/cover']);
   }
 }
