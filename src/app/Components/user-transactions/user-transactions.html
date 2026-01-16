@@ -1,0 +1,178 @@
+<app-header></app-header>
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-8">
+  <div class="container mx-auto px-4">
+    <nav class="mb-8">
+      <ol class="flex items-center space-x-2 text-sm">
+        <li>
+          <a [routerLink]="['/']" class="text-blue-600 hover:text-blue-800 transition-colors">
+            <i class="fas fa-home mr-1"></i>
+            Home
+          </a>
+        </li>
+        <li><i class="fas fa-chevron-right text-gray-400"></i></li>
+        <li class="text-gray-600">My Transactions</li>
+      </ol>
+    </nav>
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">My Orders</h1>
+      <p class="text-gray-600">Track and manage all your purchases</p>
+    </div>
+    <div class="mb-6">
+      <div class="flex flex-wrap gap-2">
+        <button (click)="setStatusFilter('')"
+          [class]="'px-4 py-2 rounded-lg font-medium transition-colors ' + 
+                        (selectedStatus === '' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100')">
+          All Orders ({{ totalOrders }})
+        </button>
+        <button (click)="setStatusFilter('Pending')"
+          [class]="'px-4 py-2 rounded-lg font-medium transition-colors ' + 
+                        (selectedStatus === 'Pending' ? 'bg-yellow-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100')">
+          Pending ({{ statusCounts['Pending'] || 0 }})
+        </button>
+        <button (click)="setStatusFilter('Accepted')"
+          [class]="'px-4 py-2 rounded-lg font-medium transition-colors ' + 
+                        (selectedStatus === 'Accepted' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100')">
+          Accepted ({{ statusCounts['Accepted'] || 0 }})
+        </button>
+        <button (click)="setStatusFilter('Completed')"
+          [class]="'px-4 py-2 rounded-lg font-medium transition-colors ' + 
+                        (selectedStatus === 'Completed' ? 'bg-green-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100')">
+          Completed ({{ statusCounts['Completed'] || 0 }})
+        </button>
+        <button (click)="setStatusFilter('Rejected')"
+          [class]="'px-4 py-2 rounded-lg font-medium transition-colors ' + 
+                        (selectedStatus === 'Rejected' ? 'bg-red-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100')">
+          Rejected ({{ statusCounts['Rejected'] || 0 }})
+        </button>
+      </div>
+    </div>
+    <div *ngIf="loading" class="bg-white rounded-2xl shadow-lg p-12 text-center">
+      <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
+      <p class="mt-4 text-gray-600">Loading your transactions...</p>
+    </div>
+    <div *ngIf="error && !loading" class="bg-white rounded-2xl shadow-lg p-8 max-w-md mx-auto text-center">
+      <div class="bg-red-50 border border-red-200 rounded-xl p-6">
+        <i class="fas fa-exclamation-circle text-red-500 text-4xl mb-4"></i>
+        <h3 class="text-lg font-bold text-red-800 mb-2">Error Loading Orders</h3>
+        <p class="text-red-600 mb-4">{{ error }}</p>
+        <button (click)="loadTransactions()"
+          class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+          <i class="fas fa-redo mr-2"></i>
+          Try Again
+        </button>
+      </div>
+    </div>
+    <div *ngIf="!loading && !error && filteredTransactions.length === 0"
+      class="bg-white rounded-2xl shadow-lg p-12 text-center">
+      <div class="max-w-sm mx-auto">
+        <div class="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <i class="fas fa-shopping-bag text-blue-500 text-3xl"></i>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800 mb-2">No Orders Yet</h3>
+        <p class="text-gray-600 mb-6">You haven't made any purchases yet. Start shopping to see your orders here!</p>
+        <a [routerLink]="['/products']"
+          class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-300 font-semibold">
+          <i class="fas fa-shopping-cart mr-2"></i>
+          Start Shopping
+        </a>
+      </div>
+    </div>
+    <div *ngIf="!loading && !error && filteredTransactions.length > 0" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div *ngFor="let transaction of filteredTransactions"
+        class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100">
+        <div class="p-6 border-b border-gray-200">
+          <div class="flex justify-between items-start">
+            <div>
+              <div class="flex items-center mb-2">
+                <span [ngClass]="{
+                  'bg-yellow-100 text-yellow-800': transaction.status === 'Pending',
+                  'bg-blue-100 text-blue-800': transaction.status === 'Accepted',
+                  'bg-green-100 text-green-800': transaction.status === 'Completed',
+                  'bg-red-100 text-red-800': transaction.status === 'Rejected'
+                }" class="px-3 py-1 text-xs font-semibold rounded-full mr-3">
+                  {{ transaction.status }}
+                </span>
+                <span class="text-sm text-gray-500">{{ transaction.transactionDate | date:'dd MMM yyyy • HH:mm'
+                  }}</span>
+              </div>
+              <h3 class="text-lg font-bold text-gray-800">Order #{{ transaction.transactionNumber }}</h3>
+              <p class="text-sm text-gray-600 mt-1">Transaction ID: {{ transaction.id | slice:0:8 }}...</p>
+            </div>
+            <div class="text-right">
+              <p class="text-2xl font-bold text-gray-800">{{ transaction.totalAmount | currency:'EGP ':'symbol':'1.2-2'
+                }}</p>
+              <p class="text-sm text-gray-600">Total Amount</p>
+            </div>
+          </div>
+        </div>
+        <div class="p-6">
+          <div class="flex items-start">
+            <div class="flex-shrink-0 mr-4">
+              <img [src]="getProductImage(transaction)" [alt]="transaction.productName"
+                class="w-20 h-20 rounded-lg object-cover border border-gray-200" (error)="onImageError($event)">
+            </div>
+            <div class="flex-1">
+              <h4 class="font-bold text-gray-800 mb-1">{{ transaction.productName }}</h4>
+              <div class="flex items-center text-sm text-gray-600 mb-2">
+                <i class="fas fa-store mr-1 text-gray-400"></i>
+                <span>{{ transaction.vendorName }}</span>
+              </div>
+              <div class="grid grid-cols-2 gap-4 mt-4">
+                <div>
+                  <p class="text-sm text-gray-500">Unit Price</p>
+                  <p class="font-semibold text-gray-800">{{ transaction.price | currency:'EGP ':'symbol':'1.2-2' }}</p>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-500">Quantity</p>
+                  <p class="font-semibold text-gray-800">{{ transaction.quantity }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="p-6 bg-gray-50 border-t border-gray-200">
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Discount Code</p>
+              <div *ngIf="transaction.discountCode"
+                class="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-800">
+                <i class="fas fa-tag mr-1 text-xs"></i>
+                <span class="font-medium">{{ transaction.discountCode }}</span>
+              </div>
+              <p *ngIf="!transaction.discountCode" class="text-gray-400 text-sm">No discount applied</p>
+            </div>
+            <div class="flex items-center space-x-3">
+              <button *ngIf="transaction.status === 'Pending'" (click)="cancelTransaction(transaction.id)"
+                [disabled]="processingTransactionId === transaction.id"
+                class="px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                <i class="fas fa-times mr-1"></i>
+                Cancel Order
+              </button>
+              <button *ngIf="transaction.status === 'Accepted'"
+                class="px-4 py-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors font-medium">
+                <i class="fas fa-shipping-fast mr-1"></i>
+                Track Order
+              </button>
+              <div *ngIf="processingTransactionId === transaction.id"
+                class="inline-block animate-spin rounded-full h-5 w-5 border-2 border-blue-600 border-t-transparent">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="filteredTransactions.length > 0 && filteredTransactions.length < totalOrders" class="mt-8 text-center">
+      <button (click)="loadMore()" [disabled]="loadingMore"
+        class="px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+        <span *ngIf="!loadingMore">
+          <i class="fas fa-redo mr-2"></i>
+          Load More Orders
+        </span>
+        <span *ngIf="loadingMore">
+          <i class="fas fa-spinner fa-spin mr-2"></i>
+          Loading...
+        </span>
+      </button>
+    </div>
+  </div>
+</div>

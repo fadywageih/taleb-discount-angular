@@ -4,13 +4,11 @@ import { Router, RouterLink } from '@angular/router';
 import { VendorService } from '../../../Services/vendor/vendor.service';
 import { AccountService } from '../../../Services/account/account-service';
 import { VendorDto } from '../../../core';
-
 interface NavItem {
   label: string;
   route: string;
   isActive: boolean;
 }
-
 @Component({
   selector: 'app-vendor-header',
   templateUrl: './vendor-header.html',
@@ -22,7 +20,8 @@ export class VendorHeader implements OnInit {
   
   navItems: NavItem[] = [
     { label: 'Home', route: '/vendor/home', isActive: true },
-    { label: 'Edit', route: '/vendor/edit', isActive: false }
+    { label: 'Edit', route: '/vendor/edit', isActive: false },
+    { label: 'Transactions', route: '/vendor/transactions', isActive: false }, 
   ];
 
   constructor(
@@ -45,11 +44,9 @@ export class VendorHeader implements OnInit {
       }
     });
   }
-
   toggleMobileMenu(): void {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
   }
-
   logout(): void {
     this.accountService.logout();
     this.router.navigate(['/cover']);

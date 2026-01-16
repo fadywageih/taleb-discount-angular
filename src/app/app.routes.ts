@@ -18,25 +18,33 @@ import { ViewProduct } from './Components/Product/view-product/view-product';
 import { About } from './Components/about/about';
 import { ProductDetails } from './Components/Product/product-details/product-details';
 import { Feedback } from './Components/feedback/feedback';
+import { VendorTransactions } from './Components/vendor-transactions/vendor-transactions';
+import { UserTransactions } from './Components/user-transactions/user-transactions';
+
 export const routes: Routes = [
   { path: '', component: Cover },
   { path: 'home', component: Home, canActivate: [authGuard] },
   { path: 'products', component: ViewProduct, canActivate: [authGuard] },
-    { path: 'products/:id', component: ProductDetails, canActivate: [authGuard] },
+  { path: 'products/:id', component: ProductDetails, canActivate: [authGuard] },
   { path: 'cover', component: Cover },
   { path: 'login', component: Login },
-    { path: 'about', component: About },
+  { path: 'about', component: About },
   { path: 'register/school', component: RegisterSchool },
   { path: 'register/vendor', component: RegisterVendor },
   { path: 'register/university', component: RegisterUniversity },
   { path: 'forgot-password', component: ForgotPassword },
   { path: 'reset-password', component: ResetPassword },
-   { path: 'feedback', component: Feedback },
-  // Vendor Routes مع VendorGuard
+  { path: 'feedback', component: Feedback },
+  
+  // Vendor Routes
   { path: 'vendor/home', component: VendorHome, canActivate: [vendorGuard] },
   { path: 'vendor/edit', component: VendorEdit, canActivate: [vendorGuard] },
   { path: 'vendor/products/create', component: CreateProduct, canActivate: [vendorGuard] },
-  {path: 'vendor/products/edit/:id',component: EditProduct,canActivate: [vendorGuard]},
+  { path: 'vendor/products/edit/:id', component: EditProduct, canActivate: [vendorGuard] },
+  { path: 'vendor/transactions', component: VendorTransactions, canActivate: [vendorGuard] },
+  
+  // User Routes
+  { path: 'user/transactions', component: UserTransactions, canActivate: [authGuard] },
 ];
 
 @NgModule({

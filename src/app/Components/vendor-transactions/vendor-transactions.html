@@ -1,0 +1,322 @@
+<app-vendor-header></app-vendor-header>
+<div class="min-h-screen bg-gradient-to-br from-rose-50 via-white to-pink-100 py-8">
+  <div class="container mx-auto px-4">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">Transaction Management</h1>
+      <p class="text-gray-600">Manage and track all your customer orders and transactions</p>
+    </div>
+    <div *ngIf="stats" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-green-500">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-500 font-medium">Total Earnings</p>
+            <p class="text-2xl font-bold text-gray-800 mt-1">{{ stats.totalEarnings | currency:'EGP ':'symbol':'1.2-2'
+              }}</p>
+          </div>
+          <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+            <i class="fas fa-money-bill-wave text-green-600 text-xl"></i>
+          </div>
+        </div>
+        <div class="mt-4">
+          <div class="flex items-center text-sm text-gray-600">
+            <i class="fas fa-arrow-up text-green-500 mr-1"></i>
+            <span>{{ stats.earningsGrowth > 0 ? '+' : '' }}{{ stats.earningsGrowth | number:'1.2-2' }}% from last
+              month</span>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-blue-500">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-500 font-medium">Total Orders</p>
+            <p class="text-2xl font-bold text-gray-800 mt-1">{{ stats.totalOrders }}</p>
+          </div>
+          <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+            <i class="fas fa-shopping-cart text-blue-600 text-xl"></i>
+          </div>
+        </div>
+        <div class="mt-2">
+          <div class="grid grid-cols-2 gap-2">
+            <div class="text-center">
+              <p class="text-xs text-gray-500">Completed</p>
+              <p class="text-sm font-semibold text-green-600">{{ stats.completedOrders }}</p>
+            </div>
+            <div class="text-center">
+              <p class="text-xs text-gray-500">Pending</p>
+              <p class="text-sm font-semibold text-yellow-600">{{ stats.pendingOrders }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-purple-500">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-500 font-medium">This Month</p>
+            <p class="text-2xl font-bold text-gray-800 mt-1">
+              {{ stats.thisMonthEarnings | currency:'EGP':'symbol':'1.2-2' }}
+            </p>
+          </div>
+          <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+            <i class="fas fa-calendar-alt text-purple-600 text-xl"></i>
+          </div>
+        </div>
+        <div class="mt-2">
+          <div class="flex items-center text-sm text-gray-600">
+            <i class="fas fa-chart-line text-purple-500 mr-1"></i>
+            <span>Current month revenue</span>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-orange-500">
+        <div class="flex items-center justify-between mb-4">
+          <p class="text-sm text-gray-500 font-medium">Order Status</p>
+          <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+            <i class="fas fa-chart-pie text-orange-600 text-xl"></i>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-600">Accepted</span>
+            <span class="font-semibold text-blue-600">{{ stats.acceptedOrders }}</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-600">Rejected</span>
+            <span class="font-semibold text-red-600">{{ stats.rejectedOrders }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+      <div class="p-6 border-b border-gray-200">
+        <div class="flex justify-between items-center">
+          <h2 class="text-xl font-bold text-gray-800">All Transactions</h2>
+          <div class="flex items-center space-x-4">
+            <div class="relative">
+              <select [(ngModel)]="selectedStatus" (change)="filterTransactions()"
+                class="appearance-none bg-gray-50 border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent">
+                <option value="">All Status</option>
+                <option value="Pending">Pending</option>
+                <option value="Accepted">Accepted</option>
+                <option value="Rejected">Rejected</option>
+                <option value="Completed">Completed</option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                <i class="fas fa-chevron-down"></i>
+              </div>
+            </div>
+            <div class="relative">
+              <input type="text" [(ngModel)]="searchTerm" (input)="filterTransactions()"
+                placeholder="Search transactions..."
+                class="pl-10 pr-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent w-64">
+              <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                <i class="fas fa-search"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="loading" class="p-8 text-center">
+        <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-rose-600 border-t-transparent">
+        </div>
+        <p class="mt-4 text-gray-600">Loading transactions...</p>
+      </div>
+      <div *ngIf="error && !loading" class="p-8 text-center">
+        <div class="bg-red-50 border border-red-200 rounded-xl p-6 max-w-md mx-auto">
+          <i class="fas fa-exclamation-circle text-red-500 text-4xl mb-4"></i>
+          <h3 class="text-lg font-bold text-red-800 mb-2">Error Loading Transactions</h3>
+          <p class="text-red-600 mb-4">{{ error }}</p>
+          <button (click)="loadTransactions()"
+            class="bg-rose-600 text-white px-4 py-2 rounded-lg hover:bg-rose-700 transition-colors">
+            <i class="fas fa-redo mr-2"></i>
+            Try Again
+          </button>
+        </div>
+      </div>
+      <div *ngIf="!loading && !error && filteredTransactions.length === 0" class="p-12 text-center">
+        <div class="max-w-sm mx-auto">
+          <div class="w-24 h-24 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="fas fa-receipt text-rose-500 text-3xl"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-2">No Transactions Found</h3>
+          <p class="text-gray-600 mb-6">You haven't received any orders yet. When customers purchase your products,
+            transactions will appear here.</p>
+        </div>
+      </div>
+      <div *ngIf="!loading && !error && filteredTransactions.length > 0" class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Transaction ID
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Discount Code
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Offer
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Date
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Price
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Quantity
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Status
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr *ngFor="let transaction of filteredTransactions" class="hover:bg-gray-50 transition-colors">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="ml-4">
+                    <div class="text-sm font-medium text-gray-900">
+                      {{ transaction.transactionNumber }}
+                    </div>
+                    <div class="text-sm text-gray-500">
+                      {{ transaction.id | slice:0:8 }}...
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900">
+                  <span *ngIf="transaction.discountCode"
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    <i class="fas fa-tag mr-1"></i>
+                    {{ transaction.discountCode }}
+                  </span>
+                  <span *ngIf="!transaction.discountCode" class="text-gray-400">No discount</span>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 h-10 w-10">
+                    <img class="h-10 w-10 rounded-lg object-cover border border-gray-200"
+                      [src]="getProductImage(transaction)" [alt]="transaction.productName"
+                      (error)="onImageError($event)">
+                  </div>
+                  <div class="ml-4">
+                    <div class="text-sm font-medium text-gray-900">
+                      {{ transaction.productName }}
+                    </div>
+                    <div class="text-sm text-gray-500">
+                      Product ID: {{ transaction.productId }}
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900">{{ transaction.transactionDate | date:'dd MMM yyyy' }}</div>
+                <div class="text-sm text-gray-500">{{ transaction.transactionDate | date:'HH:mm' }}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm font-semibold text-gray-900">
+                  {{ transaction.price | currency:'EGP ':'symbol':'1.2-2' }}
+                </div>
+                <div class="text-sm text-gray-500">
+                  Total: {{ transaction.totalAmount | currency:'EGP ':'symbol':'1.2-2' }}
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                {{ transaction.quantity }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span [ngClass]="{
+                  'bg-yellow-100 text-yellow-800': transaction.status === 'Pending',
+                  'bg-blue-100 text-blue-800': transaction.status === 'Accepted',
+                  'bg-green-100 text-green-800': transaction.status === 'Completed',
+                  'bg-red-100 text-red-800': transaction.status === 'Rejected'
+                }" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full">
+                  {{ transaction.status }}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <div class="flex items-center space-x-3">
+                  <button *ngIf="transaction.status === 'Pending'" (click)="acceptTransaction(transaction.id)"
+                    [disabled]="processingTransactionId === transaction.id"
+                    class="text-green-600 hover:text-green-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Accept Order">
+                    <i class="fas fa-check-circle text-lg"></i>
+                  </button>
+                  <button *ngIf="transaction.status === 'Pending'" (click)="openRejectModal(transaction.id)"
+                    [disabled]="processingTransactionId === transaction.id"
+                    class="text-red-600 hover:text-red-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Reject Order">
+                    <i class="fas fa-times-circle text-lg"></i>
+                  </button>
+                  <button *ngIf="transaction.status === 'Accepted'" (click)="completeTransaction(transaction.id)"
+                    [disabled]="processingTransactionId === transaction.id"
+                    class="text-blue-600 hover:text-blue-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Mark as Completed">
+                    <i class="fas fa-check-double text-lg"></i>
+                  </button>
+                  <div *ngIf="processingTransactionId === transaction.id"
+                    class="inline-block animate-spin rounded-full h-5 w-5 border-2 border-rose-600 border-t-transparent">
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div *ngIf="filteredTransactions.length > 0" class="px-6 py-4 border-t border-gray-200">
+        <div class="flex items-center justify-between">
+          <div class="text-sm text-gray-700">
+            Showing <span class="font-medium">{{ (currentPage - 1) * pageSize + 1 }}</span>
+            to <span class="font-medium">{{ Math.min(currentPage * pageSize, filteredTransactions.length) }}</span>
+            of <span class="font-medium">{{ filteredTransactions.length }}</span> results
+          </div>
+          <div class="flex items-center space-x-2">
+            <button (click)="previousPage()" [disabled]="currentPage === 1"
+              class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+              Previous
+            </button>
+            <span class="px-3 py-1 text-sm text-gray-700">
+              Page {{ currentPage }} of {{ totalPages }}
+            </span>
+            <button (click)="nextPage()" [disabled]="currentPage === totalPages"
+              class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+              Next
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="showRejectModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+  <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-2xl bg-white">
+    <div class="mb-4">
+      <h3 class="text-lg font-bold text-gray-800 mb-2">Reject Transaction</h3>
+      <p class="text-sm text-gray-600 mb-4">Please provide a reason for rejecting this order.</p>
+
+      <textarea [(ngModel)]="rejectionReason" placeholder="Enter rejection reason..." rows="3"
+        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent">
+      </textarea>
+
+      <div *ngIf="rejectionError" class="mt-2 text-sm text-red-600">
+        {{ rejectionError }}
+      </div>
+    </div>
+
+    <div class="flex justify-end space-x-3">
+      <button (click)="closeRejectModal()"
+        class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+        Cancel
+      </button>
+      <button (click)="rejectTransaction()" [disabled]="!rejectionReason || rejectionReason.trim().length < 5"
+        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+        Confirm Reject
+      </button>
+    </div>
+  </div>
+</div>

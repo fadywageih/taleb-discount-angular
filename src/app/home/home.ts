@@ -114,8 +114,6 @@ export class Home implements OnInit, OnDestroy {
     if (!product.discountPrice || product.discountPrice >= product.price) return 0;
     return Math.round(((product.price - product.discountPrice) / product.price) * 100);
   }
-
-  // إضافة دالة لعرض السعر مع الخصم
   getDisplayPrice(product: ProductResultDto): string {
     if (product.discountPrice && product.discountPrice < product.price) {
       return `$${product.discountPrice.toFixed(2)}`;
