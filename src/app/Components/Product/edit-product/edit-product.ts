@@ -1,4 +1,3 @@
-// src/app/Components/Product/edit-product/edit-product.ts
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -20,10 +19,10 @@ export class EditProduct implements OnInit {
   currentImageUrl: string = 'assets/Images/default-product.jpg';
   selectedFile: File | null = null;
   isSubmitting = false;
-  isLoading = true; 
+  isLoading = true;
   errorMessage = '';
   successMessage = '';
-  vendorData: VendorDto | null = null; 
+  vendorData: VendorDto | null = null;
 
   categories = [
     { id: 1, name: 'Supplies' },
@@ -37,7 +36,7 @@ export class EditProduct implements OnInit {
   constructor(
     private fb: FormBuilder,
     private productService: ProductService,
-    private vendorService: VendorService, 
+    private vendorService: VendorService,
     private route: ActivatedRoute,
     private router: Router
   ) {
@@ -91,7 +90,7 @@ export class EditProduct implements OnInit {
 
   private initializeForm(product: ProductResultDto): void {
     this.currentImageUrl = this.getImageUrl(product.pictureUrl || '');
-    
+
     this.productForm = this.fb.group({
       name: [product.name, [Validators.required, Validators.minLength(3)]],
       description: [product.description, [Validators.required, Validators.minLength(10)]],
@@ -109,11 +108,11 @@ export class EditProduct implements OnInit {
     if (!pictureUrl) {
       return 'assets/Images/default-product.jpg';
     }
-    
+
     if (pictureUrl.startsWith('http') || pictureUrl.startsWith('/') || pictureUrl.startsWith('assets/')) {
       return pictureUrl;
     }
-    
+
     return pictureUrl;
   }
 
@@ -144,19 +143,30 @@ export class EditProduct implements OnInit {
       this.isSubmitting = true;
       this.errorMessage = '';
       this.successMessage = '';
-
       const formData = new FormData();
-      
-      Object.keys(this.productForm.value).forEach(key => {
-        const value = this.productForm.value[key];
-        if (value !== null && value !== undefined && value !== '') {
-          formData.append(key, value.toString());
-        }
-      });
-
+      const formValues = this.productForm.value;
+      formData.append('id', this.productId.toString());
+      formData.append('name', formValues.name || '');
+      formData.append('description', formValues.description || '');
+      formData.append('price', formValues.price?.toString() || '');
+      formData.append('discountPrice', formValues.discountPrice?.toString() || '0');
+      formData.append('quantity', formValues.quantity?.toString() || '');
+      formData.append('categoryId', formValues.categoryId?.toString() || '');
+      formData.append('address', formValues.address || '');
+      formData.append('isActive', formValues.isActive?.toString() || 'true');
+      if (formValues.restockDueDate) {
+        const date = new Date(formValues.restockDueDate);
+        formData.append('restockDueDate', date.toISOString().split('T')[0]);
+      }
       if (this.selectedFile) {
         formData.append('image', this.selectedFile);
       }
+      console.log('📤 Sending update request:');
+      console.log('Product ID:', this.productId);
+      console.log('Form Data:');
+      formData.forEach((value, key) => {
+        console.log(`  ${key}: ${value}`);
+      });
 
       this.productService.updateProduct(this.productId, formData).subscribe({
         next: () => {
@@ -169,6 +179,11 @@ export class EditProduct implements OnInit {
         error: (error) => {
           this.isSubmitting = false;
           this.errorMessage = error.message || 'Failed to update product';
+          console.error('❌ Update error:', error);
+
+          if (error.error?.error) {
+            this.errorMessage = error.error.error;
+          }
         }
       });
     } else {
@@ -191,7 +206,7 @@ export class EditProduct implements OnInit {
     return !!(field && field.invalid && field.touched);
   }
 
-  getFieldError(fieldName: string): string {  
+  getFieldError(fieldName: string): string {
     const field = this.productForm.get(fieldName);
     if (field?.errors) {
       if (field.errors['required']) return 'This field is required';

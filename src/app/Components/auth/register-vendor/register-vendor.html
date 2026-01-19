@@ -57,45 +57,31 @@
                   (input)="onFieldChange('email', registerData.email)" required email
                   [class]="getInputClass(email, 'email')" placeholder="Business email"
                   class="w-full pl-12 pr-12 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-200 focus:border-rose-500 bg-white transition-all duration-300" />
-
-                <!-- مؤشر التحميل -->
                 <div *ngIf="checkingEmail" class="absolute right-3 top-1/2 transform -translate-y-1/2">
                   <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-rose-600"></div>
                 </div>
-
-                <!-- علامة الصح عندما الإيميل متاح -->
                 <div *ngIf="!checkingEmail && !fieldErrors['email'] && registerData.email && email.valid"
                   class="absolute right-3 top-1/2 transform -translate-y-1/2">
                   <i class="text-green-500 text-lg">✅</i>
                 </div>
-
-                <!-- علامة الخطأ عندما الإيميل مستخدم -->
                 <div *ngIf="!checkingEmail && fieldErrors['email'] && registerData.email"
                   class="absolute right-3 top-1/2 transform -translate-y-1/2">
                   <i class="text-red-500 text-lg">❌</i>
                 </div>
               </div>
-
-              <!-- رسائل الخطأ -->
               <div *ngIf="(email.touched || registerData.email) && fieldErrors['email']"
                 class="text-red-600 text-sm mt-1 font-medium">
                 {{ fieldErrors['email'] }}
               </div>
-
-              <!-- رسالة التحقق -->
               <div *ngIf="checkingEmail" class="text-rose-600 text-sm mt-1 font-medium flex items-center">
                 <div class="animate-spin rounded-full h-3 w-3 border-b-2 border-rose-600 mr-2"></div>
                 Checking email availability...
               </div>
-
-              <!-- رسالة النجاح -->
               <div *ngIf="!checkingEmail && !fieldErrors['email'] && registerData.email && email.valid"
                 class="text-green-600 text-sm mt-1 font-medium flex items-center">
                 <i class="mr-1">✅</i> Email is available
               </div>
             </div>
-
-            <!-- Phone -->
             <div class="space-y-2">
               <label class="text-sm font-semibold text-gray-700 block">Phone Number</label>
               <div class="relative">
@@ -111,8 +97,6 @@
               </div>
             </div>
           </div>
-
-          <!-- Description -->
           <div class="space-y-2 mt-4">
             <label class="text-sm font-semibold text-gray-700 block flex items-center">
               <i class="mr-2">📝</i> Business Description
@@ -135,7 +119,6 @@
           </h3>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Primary Address -->
             <div class="space-y-2">
               <label class="text-sm font-semibold text-gray-700 block">Primary Address</label>
               <div class="relative">
@@ -150,8 +133,6 @@
                 {{ fieldErrors['address'] }}
               </div>
             </div>
-
-            <!-- Secondary Address -->
             <div class="space-y-2">
               <label class="text-sm font-semibold text-gray-700 block">Secondary Address (Optional)</label>
               <div class="relative">

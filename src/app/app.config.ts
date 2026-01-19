@@ -5,18 +5,12 @@ import { authInterceptor } from './interceptors/auth.interceptor';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 export const appConfig: ApplicationConfig = {
   providers: [
-    // الأساسيات أولاً
     provideZoneChangeDetection({ eventCoalescing: true }),
-    
-    // HTTP Client مع الـ interceptor
     provideHttpClient(
       withInterceptors([authInterceptor]),
-      withFetch() // اختياري - إذا كنت تستخدم Fetch API
+      withFetch() 
     ),
     
-    // Router
     provideRouter(routes),
-    
-    // Animations (إذا محتاج)
   ]
 };

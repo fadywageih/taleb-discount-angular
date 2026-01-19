@@ -80,8 +80,6 @@ export class AccountService {
   isLoggedIn(): boolean {
     return !!this.getToken();
   }
-
-  // إضافة دوال التحقق من نوع المستخدم
   isVendor(): boolean {
     const user = this.getCurrentUser();
     return user?.userType === 'Vendor';
@@ -101,8 +99,6 @@ export class AccountService {
     const user = this.getCurrentUser();
     return user?.userType || null;
   }
-
-  // دوال مساعدة آمنة للـ SSR
   private setLocalStorage(key: string, value: string): void {
     if (isPlatformBrowser(this.platformId)) {
       localStorage.setItem(key, value);

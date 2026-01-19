@@ -81,15 +81,12 @@ export class RegisterVendor {
 
   onFieldChange(fieldName: string, value: any) {
     this.fieldErrors[fieldName] = this.validateField(fieldName, value);
-    
-    // التحقق من الإيميل في الداتا بيز إذا كان صحيحاً
     if (fieldName === 'email' && !this.fieldErrors['email'] && value && !this.emailCheckInProgress) {
       this.checkEmailExists(value);
     }
   }
 
   async checkEmailExists(email: string) {
-    // منع الـ duplicate checks
     if (this.emailCheckInProgress) {
       console.log('Email check already in progress, skipping...');
       return;
